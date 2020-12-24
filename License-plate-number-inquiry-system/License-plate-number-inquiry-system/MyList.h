@@ -1,0 +1,58 @@
+#pragma once
+#include <gdiplus.h>
+#pragma comment(lib,"gdiplus.lib")
+using namespace Gdiplus;
+class CMyList :public CWnd
+{
+	DECLARE_DYNAMIC(CMyList)
+public:
+	CMyList();
+	virtual ~CMyList();
+	void AddItem();//增加列表选项
+public:
+	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	afx_msg LRESULT OnMouseLeave(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnMouseHover(WPARAM wParam, LPARAM lParam);
+	DECLARE_MESSAGE_MAP()//消息必加
+protected:
+	CString title; int title_len = 0;//列表各标题（列表属性）
+	CString list_space[10]; int space_len = 0;//列表各项
+	int total_page;//总页数
+protected:
+	int option_num;//该页被选项	
+	int now_page;//当前页数
+	bool mouse_focus;//鼠标焦点
+	bool l_click;//鼠标左键按下
+	bool menu_focus;//菜单焦点
+protected:
+	CRect crect;//控件矩形
+	Rect rect;//控件矩形
+	bool initialization;//是否已初始化
+	bool draw_dc;//是否绘画缓存
+	Image* img_background;//背景
+	const int box_height = 30;//选框高度
+	int page_options;//一页选项数
+protected:
+	CDC dc; CBitmap dc_bmp; //缓存
+	Bitmap* layer_background;//背景图层
+	Bitmap* layer_text;//文字图层
+	Bitmap* layer_select_box;//选框图层
+	Bitmap* layer_select_box_click;//选框图层（单击）
+	Bitmap* layer_menu;//菜单图层
+protected:
+	void Initialize();//初始化参数
+	void Reinitialize();//重置参数
+	void DrawBackground();//画背景
+	void DrawTexts();//画文字
+	void DrawSelectBox();//画选框
+	void Draw();//结合
+	void Drawrefresh();//刷新
+
+	void ChangePage(bool next);//改变页数
+};
