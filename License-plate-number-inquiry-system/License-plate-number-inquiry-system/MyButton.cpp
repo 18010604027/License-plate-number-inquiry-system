@@ -8,7 +8,7 @@ CMyButton::CMyButton()
 	m_bkColor = 0xFFFFFF;
 	m_textColor = 0xFFFFFF;
 	bOver = 30, bDown = 180, bDisable = 0;
-	imgBackground.Load(L"bmp\\背景色.bmp");
+	imgBackground.Load(L"bmp\\背景色.bmp");//已经无用，但不知道为什么去掉会出bug
 }
 CMyButton::~CMyButton()
 {
@@ -128,14 +128,15 @@ void CMyButton::DrawButton(HDC hDestDC)
 	//把父窗口的背景图复制到按钮的DC上,实现视觉透明----------------
 	CPaintDC dc(this);
 	CRect Rect;
-	GetClientRect(&Rect);
+	GetWindowRect(&Rect);
 	int Width = Rect.Width();
 	int Height = Rect.Height();
 	CBitmap MemBmp;
 	MemBmp.CreateCompatibleBitmap(&dc, Width, Height);
 	CPoint pt(0, 0);
 	MapWindowPoints(GetParent(), &pt, 1);
-	imgBackground.BitBlt(hDC, rc, pt, SRCCOPY);
+	Gdiplus::Graphics g(hDC);
+	g.DrawImage(_background, -pt.x, -pt.y);
 	//-------------------------------------------------------------
 	int nAlpha = 100;//0--255
 	int nOffset = 0;

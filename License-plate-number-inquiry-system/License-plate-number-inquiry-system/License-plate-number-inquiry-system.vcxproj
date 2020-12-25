@@ -183,6 +183,8 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Backgound.h" />
+    <ClInclude Include="Commonfunction.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="License-plate-number-inquiry-system.h" />
     <ClInclude Include="License-plate-number-inquiry-systemDlg.h" />
@@ -193,6 +195,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Background.cpp" />
+    <ClCompile Include="Commonfunction.cpp" />
     <ClCompile Include="License-plate-number-inquiry-system.cpp" />
     <ClCompile Include="License-plate-number-inquiry-systemDlg.cpp" />
     <ClCompile Include="MyButton.cpp" />

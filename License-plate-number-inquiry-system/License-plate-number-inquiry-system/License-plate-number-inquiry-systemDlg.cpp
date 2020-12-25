@@ -7,6 +7,7 @@
 #include "License-plate-number-inquiry-system.h"
 #include "License-plate-number-inquiry-systemDlg.h"
 #include "afxdialogex.h"
+using namespace Gdiplus;
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -26,6 +27,7 @@ void CLicenseplatenumberinquirysystemDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, CAPTION, caption);
 	DDX_Control(pDX, LIST, list);
 	DDX_Control(pDX, MAX, max_button);
+	DDX_Control(pDX, IDC_EDIT1, search_edit);
 }
 
 BEGIN_MESSAGE_MAP(CLicenseplatenumberinquirysystemDlg, CDialogEx)
@@ -39,6 +41,9 @@ BEGIN_MESSAGE_MAP(CLicenseplatenumberinquirysystemDlg, CDialogEx)
 	ON_WM_NCLBUTTONDOWN()
 	ON_WM_CTLCOLOR()
 	ON_BN_CLICKED(MAX, &CLicenseplatenumberinquirysystemDlg::OnBnClickedMax)
+	ON_WM_SIZE()
+	ON_WM_SIZING()
+	ON_WM_MOVE()
 END_MESSAGE_MAP()
 
 
@@ -72,8 +77,11 @@ BOOL CLicenseplatenumberinquirysystemDlg::OnInitDialog()
 	//  执行此操作
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
-	imgBackground.Load(L"bmp\\背景色.bmp");
-
+	imgBackground = Image::FromFile(L"bmp\\背景色.bmp");
+	CRect winrect;
+	GetWindowRect(&winrect);
+	LoadBackgound(imgBackground, winrect);
+	AdjustSize(winrect);
 	// TODO: 在此添加额外的初始化代码
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -100,7 +108,7 @@ void CLicenseplatenumberinquirysystemDlg::OnPaint()
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
-		GetClientRect(&rect);
+		GetWindowRect(&rect);
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
@@ -109,10 +117,12 @@ void CLicenseplatenumberinquirysystemDlg::OnPaint()
 	}
 	else
 	{
-		//CDialogEx::OnPaint();
-		//画图DC
-		CPaintDC dc(this);
-		imgBackground.BitBlt(dc, POINT{ 0,0 }, SRCCOPY);
+		CPaintDC m_dc(this);
+		CRect winrect;
+		GetWindowRect(&winrect);
+		Graphics g(m_dc);
+		g.Clear(Color(255, 255, 255, 255));
+		g.DrawImage(_background, 0, 0);
 	}
 }
 
@@ -122,8 +132,6 @@ HCURSOR CLicenseplatenumberinquirysystemDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
-
-
 
 void CLicenseplatenumberinquirysystemDlg::OnBnClickedExit()
 {
@@ -152,7 +160,7 @@ LRESULT CLicenseplatenumberinquirysystemDlg::OnNcHitTest(CPoint point)
 	GetCursorPos(&ptCur);
 	GetWindowRect(&rect);
 	/*用于拖动窗口*/
-	if (CRect(rect.left, rect.top + 5, rect.right - 128, rect.bottom - 5).PtInRect(ptCur))
+	if (CRect(rect.left + 5, rect.top + 5, rect.right - 128, rect.bottom - 5).PtInRect(ptCur))
 	{
 		return (nHitTest == HTCLIENT) ? HTCAPTION : nHitTest;
 	}
@@ -275,7 +283,7 @@ HBRUSH CLicenseplatenumberinquirysystemDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UIN
 	HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
 
 	// TODO:  在此更改 DC 的任何特性
-	if (pWnd == &min_button|| pWnd == &exit_button || pWnd == &caption)
+	if (pWnd == &min_button || pWnd == &exit_button || pWnd == &caption || pWnd == &list)
 	{
 		pDC->SetBkMode(TRANSPARENT); //设置控件背景透明
 		return (HBRUSH)GetStockObject(NULL_BRUSH);
@@ -288,5 +296,125 @@ HBRUSH CLicenseplatenumberinquirysystemDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UIN
 void CLicenseplatenumberinquirysystemDlg::OnBnClickedMax()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	ShowWindow(SW_MAXIMIZE);
+	if (max)
+	{
+		ShowWindow(SW_NORMAL);
+		max = false;
+		max_button.SetWindowTextW(L"🗖");
+		CRect winrect;
+		GetWindowRect(&winrect);
+		AdjustSize(winrect);
+		LoadBackgound(imgBackground, winrect);
+		InvalidateRect(NULL);
+	}
+	else
+	{
+		ShowWindow(SW_MAXIMIZE);
+		max = true;
+		max_button.SetWindowTextW(L"🗗");
+		CRect winrect;
+		GetWindowRect(&winrect);
+		AdjustSize(winrect);
+		LoadBackgound(imgBackground, winrect);
+		InvalidateRect(NULL);
+	}
+}
+
+
+void CLicenseplatenumberinquirysystemDlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+	// TODO: 在此处添加消息处理程序代码
+	if (refresh)
+	{
+		CRect winrect;
+		GetWindowRect(&winrect);
+		AdjustSize(winrect);
+		LoadBackgound(imgBackground, winrect);
+		RefreshAll();
+		refresh = false;
+	}
+}
+
+
+void CLicenseplatenumberinquirysystemDlg::OnSizing(UINT fwSide, LPRECT pRect)
+{
+	CDialogEx::OnSizing(fwSide, pRect);
+	// TODO: 在此处添加消息处理程序代码
+	refresh = true;
+}
+
+void CLicenseplatenumberinquirysystemDlg::AdjustSize(LPRECT pRect)
+{
+	CRect rect;
+	//列表
+	rect.left = 20;
+	rect.right = (pRect->right - pRect->left) - 10;
+	rect.top = 80;
+	rect.bottom = (pRect->bottom - pRect->top) - 10;
+	list.MoveWindow(rect, false);//false使它不直接刷新
+
+	//搜索编辑框
+	rect.right = rect.left + 250;
+	rect.top = rect.top - 30;
+	rect.bottom = rect.top + 25;
+	search_edit.MoveWindow(rect, false);
+
+	//关闭按钮
+	rect.right = pRect->right - pRect->left;
+	rect.top = 0;
+	rect.left = rect.right - 43;
+	rect.bottom = rect.top + 24;
+	exit_button.MoveWindow(rect, false);
+
+	//最大化按钮
+	rect.right = rect.right - 44;
+	rect.left = rect.right - 44;
+	max_button.MoveWindow(rect, false);
+
+	//最小化按钮
+	rect.right = rect.right - 44;
+	rect.left = rect.right - 44;
+	min_button.MoveWindow(rect, false);
+}
+
+void CLicenseplatenumberinquirysystemDlg::RefreshAll()
+{
+	CRect winrect;
+	GetWindowRect(&winrect);
+	CRect rect;
+	rect.top = 0;
+	rect.bottom = rect.top + 80;
+	rect.left = 0;
+	rect.right = winrect.Width();
+	InvalidateRect(rect);
+	rect.top = winrect.Height() - 10;
+	rect.bottom = winrect.Height();
+	InvalidateRect(rect);
+	rect.top = 80;
+	rect.bottom = winrect.Height() - 10;
+	rect.left = 0;
+	rect.right = 20;
+	InvalidateRect(rect);
+	rect.left = winrect.Width() - 10;
+	rect.right = winrect.Width();
+	InvalidateRect(rect);
+	list.InvalidateRect(NULL);
+}
+
+void CLicenseplatenumberinquirysystemDlg::OnMove(int x, int y)
+{
+	CDialogEx::OnMove(x, y);
+
+	// TODO: 在此处添加消息处理程序代码
+	if (max)
+	{
+		max = false;
+		max_button.SetWindowTextW(L"🗖");
+		CRect winrect;
+		GetWindowRect(&winrect);
+		AdjustSize(winrect);
+		LoadBackgound(imgBackground, winrect);
+		InvalidateRect(NULL);
+	}
 }

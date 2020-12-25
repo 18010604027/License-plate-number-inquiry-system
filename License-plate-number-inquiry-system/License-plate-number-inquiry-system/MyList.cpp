@@ -114,7 +114,7 @@ void CMyList::OnSize(UINT nType, int cx, int cy)
 	//调整大小参数
 	if (initialization)
 	{
-		Reinitialize();
+		refresh = true;
 	}
 }
 
@@ -123,6 +123,12 @@ BOOL CMyList::OnEraseBkgnd(CDC* pDC)
 	if (draw_dc)
 	{
 		Draw();
+	}
+	if (refresh)
+	{
+		Reinitialize();
+		Draw();
+		refresh = false;
 	}
 	Drawrefresh();
 	return true;
@@ -171,7 +177,6 @@ void CMyList::Reinitialize()//重置大小参数
 	rect.Y = crect.left;
 	rect.Width = crect.Width();
 	rect.Height = crect.Height();
-
 	/*重置图层、缓冲*/
 	dc_bmp.Detach();
 	dc_bmp.CreateCompatibleBitmap(GetDC(), crect.Width(), crect.Height());
@@ -203,25 +208,10 @@ void CMyList::DrawBackground()
 	SolidBrush Brush(Color(255, 255, 255, 255));
 	g.FillRectangle(&Brush, rect);
 	//复制背景
-	CRect bgrect;
 	CPoint point(0, 0);
 	CLicenseplatenumberinquirysystemDlg* p = (CLicenseplatenumberinquirysystemDlg*)GetParent();
-	p->GetClientRect(&bgrect);
-	int bgwidth, bgheight;
-	bgheight = img_background->GetHeight();
-	bgwidth = img_background->GetWidth();
 	MapWindowPoints(p, &point, 1);
-	/*if (bgwidth < bgheight)
-	{
-		bgheight = bgheight * bgrect.Width() / bgwidth;
-		bgwidth = bgrect.Width();
-	}
-	else
-	{
-		bgwidth = bgwidth * bgrect.Height() / bgheight;
-		bgheight = bgrect.Height();
-	}*/
-	g.DrawImage(img_background, -point.x, -point.y, bgwidth, bgheight);
+	g.DrawImage(_background, -point.x, -point.y);
 }
 
 void CMyList::DrawTexts()//画文字
@@ -307,7 +297,6 @@ void CMyList::Draw()
 	//画文字
 	DrawTexts();
 	g.DrawImage(layer_text, 0, 0);
-
 }
 
 void CMyList::Drawrefresh()
