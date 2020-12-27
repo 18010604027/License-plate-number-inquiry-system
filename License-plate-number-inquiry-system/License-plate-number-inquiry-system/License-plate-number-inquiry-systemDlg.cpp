@@ -52,6 +52,7 @@ BEGIN_MESSAGE_MAP(CLicenseplatenumberinquirysystemDlg, CDialogEx)
 	ON_WM_SIZING()
 	ON_WM_MOVE()
 	ON_WM_ERASEBKGND()
+	ON_BN_CLICKED(SEARCH, &CLicenseplatenumberinquirysystemDlg::OnBnClickedSearch)
 END_MESSAGE_MAP()
 
 
@@ -85,7 +86,7 @@ BOOL CLicenseplatenumberinquirysystemDlg::OnInitDialog()
 	//  执行此操作
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
-	
+
 	// TODO: 在此添加额外的初始化代码
 	InitializedData();
 	SetControl();
@@ -123,8 +124,6 @@ void CLicenseplatenumberinquirysystemDlg::OnPaint()
 	else
 	{
 		CPaintDC m_dc(this);
-		CRect winrect;
-		GetWindowRect(&winrect);
 		Graphics g(m_dc);
 		g.Clear(Color(255, 255, 255, 255));
 		g.DrawImage(_background, 0, 0);
@@ -165,7 +164,7 @@ LRESULT CLicenseplatenumberinquirysystemDlg::OnNcHitTest(CPoint point)
 	GetCursorPos(&ptCur);
 	GetWindowRect(&rect);
 	/*用于拖动窗口*/
-	if (CRect(rect.left + 5, rect.top + 5, rect.right - 128, rect.bottom - 5).PtInRect(ptCur))
+	if (CRect(rect.left + 5, rect.top + 5, rect.right - 5, rect.bottom - 5).PtInRect(ptCur))
 	{
 		return (nHitTest == HTCLIENT) ? HTCAPTION : nHitTest;
 	}
@@ -435,8 +434,6 @@ BOOL CLicenseplatenumberinquirysystemDlg::OnEraseBkgnd(CDC* pDC)
 
 void CLicenseplatenumberinquirysystemDlg::SetControl()
 {
-	
-
 	search_button.SetDiaphaneity(180, 220, 110);
 	search_button.SetBkColor(RGB(128, 128, 128));
 	search_button.SetBkColorClick(RGB(105, 105, 105));
@@ -453,4 +450,10 @@ void CLicenseplatenumberinquirysystemDlg::InitializedData()
 	GetWindowRect(&winrect);
 	LoadBackgound(imgBackground, winrect);
 	AdjustSize(winrect);
+}
+
+void CLicenseplatenumberinquirysystemDlg::OnBnClickedSearch()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	
 }

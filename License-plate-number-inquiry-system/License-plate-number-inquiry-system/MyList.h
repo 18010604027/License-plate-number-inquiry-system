@@ -1,5 +1,8 @@
 #pragma once
 using namespace Gdiplus;
+
+#define WM_MENU_EDIT 11991
+#define WM_MENU_DELETE 11992
 class CMyList :public CWnd
 {
 	DECLARE_DYNAMIC(CMyList)
@@ -8,6 +11,7 @@ public:
 	virtual ~CMyList();
 	void AddItem();//增加列表选项
 public://消息区
+	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);

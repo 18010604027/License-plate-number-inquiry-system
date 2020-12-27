@@ -12,6 +12,7 @@
 #include "MyButton.h"
 #include "MyList.h"
 #include "MyMenu.h"
+#include "EditDlg.h"
 #include "License-plate-number-inquiry-systemDlg.h"
 #include "Commonfunction.h"
 #include "Backgound.h"

@@ -58,4 +58,5 @@ public:
 	void RefreshAll();//全体刷新
 	void SetControl();//设置控件
 	void InitializedData();//初始化数据	
+	afx_msg void OnBnClickedSearch();
 };

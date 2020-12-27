@@ -9,8 +9,9 @@ CMyButton::CMyButton()
 	m_textColor = 0xFFFFFF;
 	m_bkColor_click = 0xFFFFFF;
 	bOver = 30, bDown = 180, bDisable = 0;
-	imgBackground.Load(L"bmp\\背景色.bmp");//已经无用，但不知道为什么去掉会出bug
 	round = 0;
+
+	bkGound = &_background;
 }
 CMyButton::~CMyButton()
 {
@@ -51,6 +52,11 @@ void CMyButton::SetDiaphaneity(int Over, int Down, int Disable)
 void CMyButton::SetRound(int Round)
 {
 	round = Round;
+}
+
+void CMyButton::SetBkGound(Bitmap** BkGound)
+{
+	bkGound = BkGound;
 }
 
 BOOL CMyButton::PreCreateWindow(CREATESTRUCT& cs)
@@ -150,7 +156,7 @@ void CMyButton::DrawButton(HDC hDestDC)
 	CPoint pt(0, 0);
 	MapWindowPoints(GetParent(), &pt, 1);
 	Gdiplus::Graphics g(hDC);
-	g.DrawImage(_background, -pt.x, -pt.y);
+	g.DrawImage(*bkGound, -pt.x, -pt.y);
 	//-------------------------------------------------------------
 	int nAlpha = 100;//0--255
 	COLORREF bkColor=m_bkColor;

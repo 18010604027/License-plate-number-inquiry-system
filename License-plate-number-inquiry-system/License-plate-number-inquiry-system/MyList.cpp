@@ -115,8 +115,8 @@ void CMyList::OnRButtonDown(UINT nFlags, CPoint point)
 		CMyMenu menu;
 		menu.CreatePopupMenu();
 		menu.RemoveMenuBorder(GetModuleHandle(NULL));
-		menu.AppendMenu(MF_STRING, WM_DESTROY, L"修改");
-		menu.AppendMenu(MF_STRING, WM_DESTROY, L"删除");
+		menu.AppendMenu(MF_STRING, WM_MENU_EDIT, L"修改");
+		menu.AppendMenu(MF_STRING, WM_MENU_DELETE, L"删除");
 		menu.TrackPopupMenu(TPM_LEFTALIGN, rect2.left + point.x - 10, rect2.top + point.y - 10, this); //确定弹出式菜单的位置
 		HMENU hmenu = menu.Detach();
 		menu.DestroyMenu(); //资源回收
@@ -340,4 +340,20 @@ void CMyList::ChangePage(bool next)
 			Drawrefresh();
 		}
 	}
+}
+
+BOOL CMyList::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	UINT uMsg = LOWORD(wParam);
+	if (uMsg == WM_MENU_EDIT)
+	{
+		EditDlg dlg;
+		dlg.DoModal();
+	}
+	if (uMsg == WM_MENU_DELETE)
+	{
+
+	}
+	return CWnd::OnCommand(wParam, lParam);
 }
