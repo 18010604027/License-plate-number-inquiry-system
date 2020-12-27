@@ -190,6 +190,7 @@
     <ClInclude Include="License-plate-number-inquiry-systemDlg.h" />
     <ClInclude Include="MyButton.h" />
     <ClInclude Include="MyList.h" />
+    <ClInclude Include="MyMenu.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
@@ -201,6 +202,7 @@
     <ClCompile Include="License-plate-number-inquiry-systemDlg.cpp" />
     <ClCompile Include="MyButton.cpp" />
     <ClCompile Include="MyList.cpp" />
+    <ClCompile Include="MyMenu.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

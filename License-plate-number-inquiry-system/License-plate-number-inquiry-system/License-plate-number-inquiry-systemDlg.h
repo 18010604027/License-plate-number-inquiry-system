@@ -35,11 +35,12 @@ protected:
 public:
 	CMyButton min_button;
 	CMyButton exit_button;
-	Image* imgBackground;
+	CMyButton search_button;
 	CStatic caption;
 	CMyList list;
 	CMyButton max_button;
 	CEdit search_edit;
+	Image* imgBackground;
 public:
 	afx_msg void OnBnClickedExit();
 	afx_msg void OnBnClickedMin();
@@ -50,8 +51,11 @@ public:
 	afx_msg void OnBnClickedMax();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnSizing(UINT fwSide, LPRECT pRect);
+	afx_msg void OnMove(int x, int y);
+	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 public:
 	void AdjustSize(LPRECT pRect);//调整窗口控件位置
 	void RefreshAll();//全体刷新
-	afx_msg void OnMove(int x, int y);
+	void SetControl();//设置控件
+	void InitializedData();//初始化数据	
 };

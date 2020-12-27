@@ -45,6 +45,9 @@
     <ClInclude Include="Backgound.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="MyMenu.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="License-plate-number-inquiry-system.cpp">
@@ -66,6 +69,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Background.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MyMenu.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -95,6 +95,7 @@ void CMyList::OnLButtonDown(UINT nFlags, CPoint point)
 	l_click = true;
 	Draw();
 	Drawrefresh();
+
 }
 
 void CMyList::OnLButtonUp(UINT nFlags, CPoint point)
@@ -106,7 +107,21 @@ void CMyList::OnLButtonUp(UINT nFlags, CPoint point)
 
 void CMyList::OnRButtonDown(UINT nFlags, CPoint point)
 {
+	if (option_num != -1 && option_num < page_options && option_num + page_options * (now_page - 1) < space_len)
+	{
+		RECT rect2;
+		GetWindowRect(&rect2);
 
+		CMyMenu menu;
+		menu.CreatePopupMenu();
+		menu.RemoveMenuBorder(GetModuleHandle(NULL));
+		menu.AppendMenu(MF_STRING, WM_DESTROY, L"修改");
+		menu.AppendMenu(MF_STRING, WM_DESTROY, L"删除");
+		menu.TrackPopupMenu(TPM_LEFTALIGN, rect2.left + point.x - 10, rect2.top + point.y - 10, this); //确定弹出式菜单的位置
+		HMENU hmenu = menu.Detach();
+		menu.DestroyMenu(); //资源回收
+	}
+	
 }
 
 void CMyList::OnSize(UINT nType, int cx, int cy)

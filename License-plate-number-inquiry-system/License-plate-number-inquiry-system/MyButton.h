@@ -10,8 +10,10 @@ public:
 	CMyButton();
 	virtual ~CMyButton();
 	void SetBkColor(COLORREF color);
+	void SetBkColorClick(COLORREF color);
 	void SetTextColor(COLORREF color);
 	void SetDiaphaneity(int Over,int Down,int Disable);
+	void SetRound(int Round);
 
 	virtual void DrawItem(LPDRAWITEMSTRUCT /*lpDrawItemStruct*/);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
@@ -26,6 +28,7 @@ private:
 	bool m_bDisable;
 	bool m_bTracking;
 	COLORREF m_bkColor;
+	COLORREF m_bkColor_click;
 	COLORREF m_textColor;
 
 	CImage imgBackground;
@@ -33,6 +36,7 @@ private:
 	int bOver;
 	int bDown;
 	int bDisable;
+	int round;
 
 	void ButtonInit();
 	void DrawButton();

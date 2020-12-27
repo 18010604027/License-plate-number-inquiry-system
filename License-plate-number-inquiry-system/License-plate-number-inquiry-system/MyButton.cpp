@@ -7,8 +7,10 @@ CMyButton::CMyButton()
 {
 	m_bkColor = 0xFFFFFF;
 	m_textColor = 0xFFFFFF;
+	m_bkColor_click = 0xFFFFFF;
 	bOver = 30, bDown = 180, bDisable = 0;
 	imgBackground.Load(L"bmp\\背景色.bmp");//已经无用，但不知道为什么去掉会出bug
+	round = 0;
 }
 CMyButton::~CMyButton()
 {
@@ -24,9 +26,16 @@ BEGIN_MESSAGE_MAP(CMyButton, CButton)
 	ON_WM_ENABLE()
 END_MESSAGE_MAP()
 
+
+
 void CMyButton::SetBkColor(COLORREF color)
 {
 	m_bkColor = color;
+}
+
+void CMyButton::SetBkColorClick(COLORREF color)
+{
+	m_bkColor_click = color;
 }
 
 void CMyButton::SetTextColor(COLORREF color)
@@ -37,6 +46,11 @@ void CMyButton::SetTextColor(COLORREF color)
 void CMyButton::SetDiaphaneity(int Over, int Down, int Disable)
 {
 	bOver = Over, bDown = Down, bDisable = Disable;
+}
+
+void CMyButton::SetRound(int Round)
+{
+	round = Round;
 }
 
 BOOL CMyButton::PreCreateWindow(CREATESTRUCT& cs)
@@ -139,28 +153,26 @@ void CMyButton::DrawButton(HDC hDestDC)
 	g.DrawImage(_background, -pt.x, -pt.y);
 	//-------------------------------------------------------------
 	int nAlpha = 100;//0--255
+	COLORREF bkColor=m_bkColor;
 	int nOffset = 0;
 	if (m_bDisable)
 	{
 		nAlpha = bDisable;
-		m_bkColor = 0xFFFFFF;
 	}
 	else if (m_bDown)
 	{
 		nAlpha = bDown;
-		m_bkColor = RGB(0, 191, 255);
+		bkColor = m_bkColor_click;
 	}
 	else if (m_bOver)
 	{
 		nAlpha = bOver;
-		m_bkColor = 0xFFFFFF;
 	}
 	else
 	{
 		nAlpha = bDisable;
-		m_bkColor = 0xFFFFFF;
 	}
-	HBRUSH hbr = CreateSolidBrush(m_bkColor);
+	HBRUSH hbr = CreateSolidBrush(bkColor);
 	FillRect(hMaskDC, &rc, hbr);
 	DeleteObject(hbr);
 	
@@ -168,7 +180,7 @@ void CMyButton::DrawButton(HDC hDestDC)
 	memset(&blend, 0, sizeof(blend));
 	blend.BlendOp = AC_SRC_OVER;
 	blend.SourceConstantAlpha = nAlpha; // 透明度 最大255
-	HRGN hRgn = CreateRectRgn(0, 0, nWindth, nHeight);
+	HRGN hRgn = CreateRoundRectRgn(0, 0, nWindth, nHeight,round,round);
 	SelectClipRgn(hDC, hRgn);
 	AlphaBlend(hDC, 0, 0, nWindth, nHeight, hMaskDC, 0, 0, nWindth, nHeight, blend);
 	CString strText;

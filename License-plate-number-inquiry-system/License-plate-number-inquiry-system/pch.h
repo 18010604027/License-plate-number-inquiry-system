@@ -16,5 +16,6 @@
 #include "Backgound.h"
 #include <gdiplus.h>
 #pragma comment(lib,"gdiplus.lib")
-
+#include "MyMenu.h"
+#include "MenuEx.h"
 #endif //PCH_H

@@ -13,9 +13,15 @@ using namespace Gdiplus;
 #define new DEBUG_NEW
 #endif
 
+//用于装载和卸载
+Gdiplus::GdiplusStartupInput m_GdiplusStarupInput;
+ULONG_PTR m_uGdiplusToken;
+
 CLicenseplatenumberinquirysystemDlg::CLicenseplatenumberinquirysystemDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_LICENSEPLATENUMBERINQUIRYSYSTEM_DIALOG, pParent)
 {
+	//加载GDI+
+	Gdiplus::GdiplusStartup(&m_uGdiplusToken, &m_GdiplusStarupInput, nullptr);
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
@@ -28,6 +34,7 @@ void CLicenseplatenumberinquirysystemDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, LIST, list);
 	DDX_Control(pDX, MAX, max_button);
 	DDX_Control(pDX, IDC_EDIT1, search_edit);
+	DDX_Control(pDX, SEARCH, search_button);
 }
 
 BEGIN_MESSAGE_MAP(CLicenseplatenumberinquirysystemDlg, CDialogEx)
@@ -44,6 +51,7 @@ BEGIN_MESSAGE_MAP(CLicenseplatenumberinquirysystemDlg, CDialogEx)
 	ON_WM_SIZE()
 	ON_WM_SIZING()
 	ON_WM_MOVE()
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 
@@ -77,13 +85,10 @@ BOOL CLicenseplatenumberinquirysystemDlg::OnInitDialog()
 	//  执行此操作
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
-	imgBackground = Image::FromFile(L"bmp\\背景色.bmp");
-	CRect winrect;
-	GetWindowRect(&winrect);
-	LoadBackgound(imgBackground, winrect);
-	AdjustSize(winrect);
+	
 	// TODO: 在此添加额外的初始化代码
-
+	InitializedData();
+	SetControl();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -283,7 +288,7 @@ HBRUSH CLicenseplatenumberinquirysystemDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UIN
 	HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
 
 	// TODO:  在此更改 DC 的任何特性
-	if (pWnd == &min_button || pWnd == &exit_button || pWnd == &caption || pWnd == &list)
+	if (pWnd == &min_button || pWnd == &exit_button || pWnd == &caption || pWnd == &list || pWnd == &search_button)
 	{
 		pDC->SetBkMode(TRANSPARENT); //设置控件背景透明
 		return (HBRUSH)GetStockObject(NULL_BRUSH);
@@ -360,6 +365,11 @@ void CLicenseplatenumberinquirysystemDlg::AdjustSize(LPRECT pRect)
 	rect.bottom = rect.top + 25;
 	search_edit.MoveWindow(rect, false);
 
+	//搜索按钮
+	rect.left = rect.right + 20;
+	rect.right = rect.left + 60;
+	search_button.MoveWindow(rect, false);
+
 	//关闭按钮
 	rect.right = pRect->right - pRect->left;
 	rect.top = 0;
@@ -380,26 +390,7 @@ void CLicenseplatenumberinquirysystemDlg::AdjustSize(LPRECT pRect)
 
 void CLicenseplatenumberinquirysystemDlg::RefreshAll()
 {
-	CRect winrect;
-	GetWindowRect(&winrect);
-	CRect rect;
-	rect.top = 0;
-	rect.bottom = rect.top + 80;
-	rect.left = 0;
-	rect.right = winrect.Width();
-	InvalidateRect(rect);
-	rect.top = winrect.Height() - 10;
-	rect.bottom = winrect.Height();
-	InvalidateRect(rect);
-	rect.top = 80;
-	rect.bottom = winrect.Height() - 10;
-	rect.left = 0;
-	rect.right = 20;
-	InvalidateRect(rect);
-	rect.left = winrect.Width() - 10;
-	rect.right = winrect.Width();
-	InvalidateRect(rect);
-	list.InvalidateRect(NULL);
+	InvalidateRect(NULL);
 }
 
 void CLicenseplatenumberinquirysystemDlg::OnMove(int x, int y)
@@ -417,4 +408,49 @@ void CLicenseplatenumberinquirysystemDlg::OnMove(int x, int y)
 		LoadBackgound(imgBackground, winrect);
 		InvalidateRect(NULL);
 	}
+}
+
+
+BOOL CLicenseplatenumberinquirysystemDlg::OnEraseBkgnd(CDC* pDC)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	CPaintDC m_dc(this);
+
+	//擦除采用双缓冲，防闪烁
+	CPaintDC* Mdc = &m_dc;
+	CDC dc;
+	CBitmap bmp;
+	CRect winrect;
+	GetClientRect(&winrect);
+	dc.CreateCompatibleDC(Mdc);
+	bmp.CreateCompatibleBitmap(Mdc, winrect.Width(), winrect.Height());
+	dc.SelectObject(&bmp);
+
+	Graphics g(dc);
+	g.Clear(Color(255, 255, 255, 255));
+	g.DrawImage(_background, 0, 0);
+	Mdc->BitBlt(0, 0, winrect.Width(), winrect.Height(), &dc, 0, 0, SRCCOPY);
+	return true;
+}
+
+void CLicenseplatenumberinquirysystemDlg::SetControl()
+{
+	
+
+	search_button.SetDiaphaneity(180, 220, 110);
+	search_button.SetBkColor(RGB(128, 128, 128));
+	search_button.SetBkColorClick(RGB(105, 105, 105));
+	search_button.SetRound(3);
+	min_button.SetBkColorClick(RGB(0, 122, 205));
+	max_button.SetBkColorClick(RGB(0, 122, 205));
+	exit_button.SetBkColorClick(RGB(255, 0, 0));
+}
+
+void CLicenseplatenumberinquirysystemDlg::InitializedData()
+{
+	imgBackground = Image::FromFile(L"bmp\\背景色.bmp");
+	CRect winrect;
+	GetWindowRect(&winrect);
+	LoadBackgound(imgBackground, winrect);
+	AdjustSize(winrect);
 }
