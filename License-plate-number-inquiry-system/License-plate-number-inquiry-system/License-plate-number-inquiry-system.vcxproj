@@ -219,8 +219,6 @@
     <None Include="res\Licenseplatenumberinquirysystem.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="bmp\背景色.bmp" />
-    <Image Include="res\bitmap1.bmp" />
     <Image Include="res\License-plate-number-inquiry-system.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

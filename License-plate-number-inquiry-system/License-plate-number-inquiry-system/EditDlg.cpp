@@ -28,6 +28,10 @@ void EditDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_BUTTON1, ok_button);
 	DDX_Control(pDX, IDC_BUTTON2, cancel_button);
 	DDX_Control(pDX, CAPTION2, caption);
+	DDX_Control(pDX, IDC_EDIT2, id_edit);
+	DDX_Control(pDX, IDC_EDIT3, name_edit);
+	DDX_Control(pDX, IDC_EDIT4, site_edit);
+	DDX_Control(pDX, IDC_EDIT5, phone_edit);
 }
 
 BEGIN_MESSAGE_MAP(EditDlg, CDialogEx)
@@ -38,6 +42,8 @@ BEGIN_MESSAGE_MAP(EditDlg, CDialogEx)
 	ON_WM_CTLCOLOR()
 	ON_BN_CLICKED(IDC_BUTTON1, &EditDlg::OnBnClickedButton1)
 	ON_BN_CLICKED(IDC_BUTTON2, &EditDlg::OnBnClickedButton2)
+	ON_STN_CLICKED(IDC_STATIC2, &EditDlg::OnStnClickedStatic2)
+	ON_STN_CLICKED(IDC_STATIC4, &EditDlg::OnStnClickedStatic4)
 END_MESSAGE_MAP()
 
 // EditDlg 消息处理程序
@@ -58,7 +64,7 @@ LRESULT EditDlg::OnNcHitTest(CPoint point)
 	GetCursorPos(&ptCur);
 	GetWindowRect(&rect);
 	/*用于拖动窗口*/
-	if (CRect(rect.left , rect.top, rect.right, rect.bottom).PtInRect(ptCur))
+	if (CRect(rect.left, rect.top, rect.right, rect.bottom).PtInRect(ptCur))
 	{
 		return (nHitTest == HTCLIENT) ? HTCAPTION : nHitTest;
 	}
@@ -106,7 +112,6 @@ BOOL EditDlg::OnEraseBkgnd(CDC* pDC)
 	g.DrawImage(m_background, 0, 0);
 	Mdc->BitBlt(0, 0, winrect.Width(), winrect.Height(), &dc, 0, 0, SRCCOPY);
 	return true;
-	return true;
 }
 
 
@@ -115,7 +120,7 @@ HBRUSH EditDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 	HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
 
 	// TODO:  在此更改 DC 的任何特性
-	if (pWnd == &exit_button|| pWnd == &caption|| pWnd->GetDlgCtrlID()== IDC_STATIC1 || pWnd->GetDlgCtrlID() == IDC_STATIC2 || pWnd->GetDlgCtrlID() == IDC_STATIC3 || pWnd->GetDlgCtrlID() == IDC_STATIC4)
+	if (pWnd == &exit_button || pWnd == &caption || pWnd->GetDlgCtrlID() == IDC_STATIC1 || pWnd->GetDlgCtrlID() == IDC_STATIC2 || pWnd->GetDlgCtrlID() == IDC_STATIC3 || pWnd->GetDlgCtrlID() == IDC_STATIC4)
 	{
 		pDC->SetBkMode(TRANSPARENT); //设置控件背景透明
 		return (HBRUSH)GetStockObject(NULL_BRUSH);
@@ -125,7 +130,7 @@ HBRUSH EditDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 }
 
 void EditDlg::SetControl()
-{	
+{
 	exit_button.SetBkColorClick(RGB(255, 0, 0));
 	exit_button.SetBkGound(&m_background);
 	ok_button.SetBkGound(&m_background);
@@ -140,6 +145,12 @@ void EditDlg::SetControl()
 	//cancel_button.SetBkColor(RGB(64, 224, 208));
 	//cancel_button.SetBkColorClick(RGB(105, 105, 105));
 	cancel_button.SetRound(3);
+
+	caption.SetWindowTextW(caption_txt);
+	id_edit.SetWindowTextW(id);
+	name_edit.SetWindowTextW(name);
+	site_edit.SetWindowTextW(site);
+	phone_edit.SetWindowTextW(phone);
 }
 
 void EditDlg::InitializedData()
@@ -166,12 +177,52 @@ void EditDlg::SetStyle()
 void EditDlg::OnBnClickedButton1()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	EndDialog(0);
+	id_edit.GetWindowTextW(id);
+	name_edit.GetWindowTextW(name);
+	site_edit.GetWindowTextW(site);
+	phone_edit.GetWindowTextW(phone);
+	OnOK();
 }
 
 
 void EditDlg::OnBnClickedButton2()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	EndDialog(0);
+	OnCancel();
+}
+
+
+void EditDlg::OnStnClickedStatic2()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void EditDlg::OnStnClickedStatic4()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void EditDlg::SetData(int i, ...)
+{
+	va_list arg_ptr;
+	va_start(arg_ptr, i);
+	id = va_arg(arg_ptr, LPCWSTR);
+	name = va_arg(arg_ptr, LPCWSTR);
+	site = va_arg(arg_ptr, LPCWSTR);
+	phone = va_arg(arg_ptr, LPCWSTR);
+	va_end(arg_ptr);
+}
+void EditDlg::SetCaption(CString caption)
+{
+	caption_txt = caption;
+}
+
+void EditDlg::GetData(CString& _id, CString& _name, CString& _site, CString& _phone)
+{
+	_id = id;
+	_name = name;
+	_site = site;
+	_phone = phone;
 }

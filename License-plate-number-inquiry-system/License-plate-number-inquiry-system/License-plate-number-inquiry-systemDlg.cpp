@@ -35,6 +35,7 @@ void CLicenseplatenumberinquirysystemDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, MAX, max_button);
 	DDX_Control(pDX, IDC_EDIT1, search_edit);
 	DDX_Control(pDX, SEARCH, search_button);
+	DDX_Control(pDX, IDC_COMBO1, combo);
 }
 
 BEGIN_MESSAGE_MAP(CLicenseplatenumberinquirysystemDlg, CDialogEx)
@@ -53,6 +54,8 @@ BEGIN_MESSAGE_MAP(CLicenseplatenumberinquirysystemDlg, CDialogEx)
 	ON_WM_MOVE()
 	ON_WM_ERASEBKGND()
 	ON_BN_CLICKED(SEARCH, &CLicenseplatenumberinquirysystemDlg::OnBnClickedSearch)
+	ON_WM_GETMINMAXINFO()
+	ON_WM_DESTROY()
 END_MESSAGE_MAP()
 
 
@@ -313,6 +316,7 @@ void CLicenseplatenumberinquirysystemDlg::OnBnClickedMax()
 	}
 	else
 	{
+		GetWindowRect(m_rect);
 		ShowWindow(SW_MAXIMIZE);
 		max = true;
 		max_button.SetWindowTextW(L"🗗");
@@ -358,10 +362,15 @@ void CLicenseplatenumberinquirysystemDlg::AdjustSize(LPRECT pRect)
 	rect.bottom = (pRect->bottom - pRect->top) - 10;
 	list.MoveWindow(rect, false);//false使它不直接刷新
 
-	//搜索编辑框
-	rect.right = rect.left + 250;
+	//下拉列表
+	rect.right = rect.left + 110;
 	rect.top = rect.top - 30;
 	rect.bottom = rect.top + 25;
+	combo.MoveWindow(rect, false);
+
+	//搜索编辑框
+	rect.left = rect.right + 10;
+	rect.right = rect.left + 250;
 	search_edit.MoveWindow(rect, false);
 
 	//搜索按钮
@@ -441,19 +450,125 @@ void CLicenseplatenumberinquirysystemDlg::SetControl()
 	min_button.SetBkColorClick(RGB(0, 122, 205));
 	max_button.SetBkColorClick(RGB(0, 122, 205));
 	exit_button.SetBkColorClick(RGB(255, 0, 0));
+
+	combo.AddString(L"一般查询");
+	combo.AddString(L"正则表达式查询");
+	combo.SetCurSel(0);
+
+	list.AddProverty(L"车牌号");
+	list.AddProverty(L"姓名");
+	list.AddProverty(L"地址");
+	list.AddProverty(L"联系方式");
+
+	list.AddItem(4, L"123321", L"刘", L"天堂", L"1243213121");
 }
 
 void CLicenseplatenumberinquirysystemDlg::InitializedData()
 {
+	//初始化窗口控件位置
+	CRect pRect;
+	ifstream infile;
+	infile.open("Data\\windows", ios::in | ios::binary);
+	bool max_ = false;
+	if (infile)
+	{
+		int len = sizeof(pRect.top);
+		infile.read((char*)&max_, sizeof(bool));//临时存放max，防止修改窗口大小时刷新
+		infile.read((char*)&pRect.top, len);
+		infile.read((char*)&pRect.bottom, len);
+		infile.read((char*)&pRect.left, len);
+		infile.read((char*)&pRect.right, len);
+		MoveWindow(pRect, true);
+	}
+	else
+	{
+		GetClientRect(pRect);
+	}
 	imgBackground = Image::FromFile(L"bmp\\背景色.bmp");
+	if (max_)
+	{
+		m_rect = pRect;
+		ShowWindow(SW_MAXIMIZE);
+		max_button.SetWindowTextW(L"🗗");
+		max = max_;
+	}
 	CRect winrect;
 	GetWindowRect(&winrect);
 	LoadBackgound(imgBackground, winrect);
 	AdjustSize(winrect);
+	if (max_)
+	{
+		RefreshAll();
+	}
 }
 
 void CLicenseplatenumberinquirysystemDlg::OnBnClickedSearch()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	
+
+}
+
+
+void CLicenseplatenumberinquirysystemDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	lpMMI->ptMinTrackSize.x = 500;   //x宽度  
+	lpMMI->ptMinTrackSize.y = 200;   //y高度 
+	CDialogEx::OnGetMinMaxInfo(lpMMI);
+}
+
+
+void CLicenseplatenumberinquirysystemDlg::OnDestroy()
+{
+	CDialogEx::OnDestroy();
+
+	// TODO: 在此处添加消息处理程序代码
+	CRect pRect;
+	ofstream outfile;
+	outfile.open("Data\\windows", std::ios::binary);
+	if (max)
+	{
+		pRect = m_rect;
+	}
+	else
+	{
+		GetWindowRect(pRect);
+	}
+
+	if (outfile)
+	{
+		const int len = sizeof(int);
+		outfile.write((char*)&max, sizeof(bool));
+		outfile.write((char*)&pRect.top, len);
+		outfile.write((char*)&pRect.bottom, len);
+		outfile.write((char*)&pRect.left, len);
+		outfile.write((char*)&pRect.right, len);
+	}
+	outfile.close();
+}
+
+
+
+
+BOOL CLicenseplatenumberinquirysystemDlg::PreTranslateMessage(MSG* pMsg)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_RETURN)
+	{
+		if (GetFocus() == &search_edit)
+		{
+			OnSearchEditDown();
+		}
+		return TRUE;
+	}
+	if (pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE)
+	{
+		return TRUE;
+	}
+	return CDialogEx::PreTranslateMessage(pMsg);
+}
+
+void CLicenseplatenumberinquirysystemDlg::OnSearchEditDown()
+{
+
 }

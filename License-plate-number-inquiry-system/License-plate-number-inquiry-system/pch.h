@@ -18,4 +18,7 @@
 #include "Backgound.h"
 #include <gdiplus.h>
 #pragma comment(lib,"gdiplus.lib")
+#include <iostream> 
+#include <fstream> 
+using namespace std;
 #endif //PCH_H

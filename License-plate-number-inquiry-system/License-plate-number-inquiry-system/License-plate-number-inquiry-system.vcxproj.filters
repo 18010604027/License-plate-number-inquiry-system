@@ -95,11 +95,5 @@
     <Image Include="res\License-plate-number-inquiry-system.ico">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="bmp\背景色.bmp">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="res\bitmap1.bmp">
-      <Filter>资源文件</Filter>
-    </Image>
   </ItemGroup>
 </Project>

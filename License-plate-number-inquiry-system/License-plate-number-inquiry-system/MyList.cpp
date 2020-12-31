@@ -8,13 +8,12 @@ CMyList::CMyList()
 	draw_dc = true;
 	img_background = Image::FromFile(L"bmp\\背景色.bmp");
 	option_num = -1;
+	menu_num = -1;
 	mouse_focus = false;
 	l_click = false;
 
-	title = L"名字   车牌号";
-	list_space[0] = L"无敌   111111";
-	list_space[1] = L"神之   222222";
-	space_len = 2;
+	title = L"";
+	space_len = 0;
 
 	now_page = 1;
 	total_page = 2;
@@ -40,11 +39,25 @@ BEGIN_MESSAGE_MAP(CMyList, CWnd)
 END_MESSAGE_MAP()
 
 
-void CMyList::AddItem()//增加列表选项 
+void CMyList::AddItem(int i, ...)//增加列表选项 
 {
-
+	LPCWSTR str = 0;
+	va_list arg_ptr;
+	va_start(arg_ptr, i);
+	int j = 0;
+	for (int j = 0; j < i; j++)
+	{
+		str = va_arg(arg_ptr, LPCWSTR);
+		list_space[space_len][j] = str;
+	}
+	space_len++;
+	va_end(arg_ptr);
 }
 
+void CMyList::AddProverty(CString Title)
+{
+	titles[title_len++] = Title;
+}
 
 BOOL CMyList::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
@@ -92,10 +105,10 @@ LRESULT CMyList::OnMouseHover(WPARAM wParam, LPARAM lParam)
 
 void CMyList::OnLButtonDown(UINT nFlags, CPoint point)
 {
+	SetFocus();//获取焦点
 	l_click = true;
 	Draw();
 	Drawrefresh();
-
 }
 
 void CMyList::OnLButtonUp(UINT nFlags, CPoint point)
@@ -103,10 +116,17 @@ void CMyList::OnLButtonUp(UINT nFlags, CPoint point)
 	l_click = false;
 	Draw();
 	Drawrefresh();
+	if (option_num != -1 && option_num < page_options && option_num + page_options * (now_page - 1) < space_len)
+	{
+		menu_num = option_num;
+		MenuChange();
+	}
 }
 
 void CMyList::OnRButtonDown(UINT nFlags, CPoint point)
 {
+	SetFocus();//获取焦点
+	menu_num = option_num;
 	if (option_num != -1 && option_num < page_options && option_num + page_options * (now_page - 1) < space_len)
 	{
 		RECT rect2;
@@ -115,13 +135,26 @@ void CMyList::OnRButtonDown(UINT nFlags, CPoint point)
 		CMyMenu menu;
 		menu.CreatePopupMenu();
 		menu.RemoveMenuBorder(GetModuleHandle(NULL));
+		menu.AppendMenu(MF_STRING, WM_MENU_ADD, L"添加");
 		menu.AppendMenu(MF_STRING, WM_MENU_EDIT, L"修改");
 		menu.AppendMenu(MF_STRING, WM_MENU_DELETE, L"删除");
 		menu.TrackPopupMenu(TPM_LEFTALIGN, rect2.left + point.x - 10, rect2.top + point.y - 10, this); //确定弹出式菜单的位置
 		HMENU hmenu = menu.Detach();
 		menu.DestroyMenu(); //资源回收
 	}
-	
+	else
+	{
+		RECT rect2;
+		GetWindowRect(&rect2);
+
+		CMyMenu menu;
+		menu.CreatePopupMenu();
+		menu.RemoveMenuBorder(GetModuleHandle(NULL));
+		menu.AppendMenu(MF_STRING, WM_MENU_ADD, L"添加");
+		menu.TrackPopupMenu(TPM_LEFTALIGN, rect2.left + point.x - 10, rect2.top + point.y - 10, this); //确定弹出式菜单的位置
+		HMENU hmenu = menu.Detach();
+		menu.DestroyMenu(); //资源回收
+	}
 }
 
 void CMyList::OnSize(UINT nType, int cx, int cy)
@@ -249,10 +282,20 @@ void CMyList::DrawTexts()//画文字
 	Gdiplus::SolidBrush blackBrush(Color(255, 255, 255, 255));
 
 	//打印内容
-	g.DrawString(title, title.GetLength(), &myFont, RectF(2, 0, rect.Width, box_height), &font_attribute, &blackBrush);
+	title = L"";
+	int len = (rect.Width - 2) / title_len;
+	for (int i = 0; i < title_len; i++)
+	{
+		g.DrawString(titles[i], titles[i].GetLength(), &myFont, RectF(2 + i * len, 0, len, box_height), &font_attribute, &blackBrush);
+	}
+	//g.DrawString(title, title.GetLength(), &myFont, RectF(2, 0, rect.Width, box_height), &font_attribute, &blackBrush);
 	for (int i = 0; i + page_options * (now_page - 1) < space_len && i < page_options; i++)
 	{
-		g.DrawString(list_space[i], list_space[i].GetLength(), &myFont, RectF(2, box_height * (i + 1) + 0, rect.Width, box_height), &font_attribute, &blackBrush);
+		CString str;
+		for (int j = 0; j < title_len; j++)
+		{
+			g.DrawString(list_space[i][j], list_space[i][j].GetLength(), &myFont, RectF(2 + j * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
+		}
 	}
 
 	//打印页数
@@ -341,19 +384,53 @@ void CMyList::ChangePage(bool next)
 		}
 	}
 }
-
+void CMyList::MenuChange()
+{
+	EditDlg dlg;
+	dlg.SetCaption(L"编辑");
+	dlg.SetData(4,
+		list_space[menu_num][0],
+		list_space[menu_num][1],
+		list_space[menu_num][2],
+		list_space[menu_num][3]);
+	if (dlg.DoModal() == IDOK)
+	{
+		dlg.GetData(list_space[menu_num][0],
+			list_space[menu_num][1],
+			list_space[menu_num][2],
+			list_space[menu_num][3]);
+		DrawTexts();
+		Draw();
+		Drawrefresh();
+	}
+}
 BOOL CMyList::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	// TODO: 在此添加专用代码和/或调用基类
 	UINT uMsg = LOWORD(wParam);
-	if (uMsg == WM_MENU_EDIT)
+	if (uMsg == WM_MENU_ADD)
 	{
 		EditDlg dlg;
-		dlg.DoModal();
+		dlg.SetCaption(L"添加");
+		if (dlg.DoModal() == IDOK)
+		{
+			/*dlg.GetData(list_space[menu_num][0],
+				list_space[menu_num][1],
+				list_space[menu_num][2],
+				list_space[menu_num][3]);*/
+			DrawTexts();
+			Draw();
+			Drawrefresh();
+		}
+	}
+	if (uMsg == WM_MENU_EDIT)
+	{
+		MenuChange();
 	}
 	if (uMsg == WM_MENU_DELETE)
 	{
 
 	}
+
 	return CWnd::OnCommand(wParam, lParam);
 }

@@ -1,6 +1,7 @@
 #pragma once
 using namespace Gdiplus;
 
+#define WM_MENU_ADD 11990
 #define WM_MENU_EDIT 11991
 #define WM_MENU_DELETE 11992
 class CMyList :public CWnd
@@ -9,7 +10,8 @@ class CMyList :public CWnd
 public:
 	CMyList();
 	virtual ~CMyList();
-	void AddItem();//增加列表选项
+	void AddItem(int i, ...);//增加列表选项
+	void AddProverty(CString Title);//增加列表属性
 public://消息区
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
@@ -23,10 +25,11 @@ public://消息区
 	afx_msg LRESULT OnMouseHover(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()//消息必加
 protected://列表内容
-	CString title; int title_len = 0;//列表各标题（列表属性）
-	CString list_space[10]; int space_len = 0;//列表各项
+	CString title, titles[10]; int title_len = 0;//列表各标题（列表属性）
+	CString list_space[10][10]; int space_len = 0;//列表各项
 protected://列表状态
-	int option_num;//该页被选项	
+	int option_num;//该页被选项
+	int menu_num;//菜单被选择项
 	int now_page;//当前页数
 	bool mouse_focus;//鼠标焦点
 	bool l_click;//鼠标左键按下
@@ -58,4 +61,5 @@ protected://绘画功能
 	void Drawrefresh();//刷新
 protected://列表功能
 	void ChangePage(bool next);//改变页数
+	void MenuChange();//编辑选项
 };
