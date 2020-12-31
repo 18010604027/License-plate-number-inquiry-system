@@ -158,7 +158,7 @@ void EditDlg::InitializedData()
 	CRect winrect;
 	GetWindowRect(&winrect);
 	Image* imgBackground;
-	imgBackground = Image::FromFile(L"bmp\\背景色2.bmp");
+	imgBackground = Image::FromFile(L"Data\\bmp\\背景色2.bmp");
 	m_background = new Bitmap(winrect.Width(), winrect.Height());
 	Graphics g(m_background);
 	g.Clear(Color(255, 255, 255, 255));

@@ -25,7 +25,7 @@ public://消息区
 	afx_msg LRESULT OnMouseHover(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()//消息必加
 protected://列表内容
-	CString title, titles[10]; int title_len = 0;//列表各标题（列表属性）
+	CString titles[10]; int title_len = 0;//列表各标题（列表属性）
 	CString list_space[10][10]; int space_len = 0;//列表各项
 protected://列表状态
 	int option_num;//该页被选项

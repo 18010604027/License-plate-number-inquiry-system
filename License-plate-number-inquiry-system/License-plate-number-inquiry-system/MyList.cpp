@@ -6,13 +6,12 @@ CMyList::CMyList()
 {
 	initialization = false;
 	draw_dc = true;
-	img_background = Image::FromFile(L"bmp\\背景色.bmp");
+	img_background = Gdiplus::Image::FromFile(L"bmp\\背景色.bmp");
 	option_num = -1;
 	menu_num = -1;
 	mouse_focus = false;
 	l_click = false;
 
-	title = L"";
 	space_len = 0;
 
 	now_page = 1;
@@ -273,29 +272,19 @@ void CMyList::DrawTexts()//画文字
 	g.FillRectangle(&brush, rect);
 
 	//设置格式
+	g.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAlias);
 	g.SetCompositingMode(Gdiplus::CompositingModeSourceOver);
-	g.SetTextRenderingHint(Gdiplus::TextRenderingHintClearTypeGridFit);//文字模式
 	Gdiplus::StringFormat font_attribute;
 	font_attribute.SetAlignment(Gdiplus::StringAlignmentNear);
 	font_attribute.SetLineAlignment(Gdiplus::StringAlignmentCenter);
-	Gdiplus::Font myFont(L"宋体", 9);                  //设置字体
+	Gdiplus::Font myFont(L"黑体", 11);                  //设置字体
 	Gdiplus::SolidBrush blackBrush(Color(255, 255, 255, 255));
 
-	//打印内容
-	title = L"";
-	int len = (rect.Width - 2) / title_len;
+	//打印属性
+	int len = rect.Width / title_len;
 	for (int i = 0; i < title_len; i++)
 	{
-		g.DrawString(titles[i], titles[i].GetLength(), &myFont, RectF(2 + i * len, 0, len, box_height), &font_attribute, &blackBrush);
-	}
-	//g.DrawString(title, title.GetLength(), &myFont, RectF(2, 0, rect.Width, box_height), &font_attribute, &blackBrush);
-	for (int i = 0; i + page_options * (now_page - 1) < space_len && i < page_options; i++)
-	{
-		CString str;
-		for (int j = 0; j < title_len; j++)
-		{
-			g.DrawString(list_space[i][j], list_space[i][j].GetLength(), &myFont, RectF(2 + j * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
-		}
+		g.DrawString(titles[i], titles[i].GetLength(), &myFont, RectF(i * len, 0, len, box_height), &font_attribute, &blackBrush);
 	}
 
 	//打印页数
@@ -303,6 +292,21 @@ void CMyList::DrawTexts()//画文字
 	CString prin_page;
 	prin_page.Format(L"%d/%d", now_page, total_page);
 	g.DrawString(prin_page, prin_page.GetLength(), &myFont, RectF(2, rect.Height - box_height, rect.Width, box_height), &font_attribute, &blackBrush);
+	
+	//打印内容
+	Gdiplus::Font myFont2(L"宋体", 10); 
+	font_attribute.SetAlignment(Gdiplus::StringAlignmentNear);
+	g.SetTextRenderingHint(Gdiplus::TextRenderingHintClearTypeGridFit);//文字模式
+	for (int i = 0; i + page_options * (now_page - 1) < space_len && i < page_options; i++)
+	{
+		CString str;
+		for (int j = 0; j < title_len; j++)
+		{
+			g.DrawString(list_space[i][j], list_space[i][j].GetLength(), &myFont2, RectF(2 + j * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
+		}
+	}
+
+	
 }
 
 void CMyList::DrawSelectBox()
@@ -408,6 +412,7 @@ BOOL CMyList::OnCommand(WPARAM wParam, LPARAM lParam)
 {
 	// TODO: 在此添加专用代码和/或调用基类
 	UINT uMsg = LOWORD(wParam);
+	//接收菜单信息
 	if (uMsg == WM_MENU_ADD)
 	{
 		EditDlg dlg;

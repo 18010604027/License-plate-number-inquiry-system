@@ -484,7 +484,7 @@ void CLicenseplatenumberinquirysystemDlg::InitializedData()
 	{
 		GetClientRect(pRect);
 	}
-	imgBackground = Image::FromFile(L"bmp\\背景色.bmp");
+	imgBackground = Image::FromFile(L"Data\\bmp\\背景色.bmp");
 	if (max_)
 	{
 		m_rect = pRect;
