@@ -425,6 +425,7 @@ BOOL CMyList::OnCommand(WPARAM wParam, LPARAM lParam)
 		dlg.SetCaption(L"Ìí¼Ó");
 		if (dlg.DoModal() == IDOK)
 		{
+			//list_data.insert()
 			/*dlg.GetData(list_space[menu_num][0],
 				list_space[menu_num][1],
 				list_space[menu_num][2],

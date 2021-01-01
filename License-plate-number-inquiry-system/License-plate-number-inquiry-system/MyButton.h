@@ -1,6 +1,4 @@
 #pragma once
-
-#include "pch.h"
 using namespace Gdiplus;
 
 class CMyButton :public CButton

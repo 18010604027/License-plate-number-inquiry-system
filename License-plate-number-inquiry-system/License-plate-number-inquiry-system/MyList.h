@@ -27,6 +27,7 @@ public://消息区
 protected://列表内容
 	CString titles[10]; int title_len = 0;//列表各标题（列表属性）
 	CString list_space[10][10]; int space_len = 0;//列表各项
+	plate_number list_data;
 protected://列表状态
 	int option_num;//该页被选项
 	int menu_num;//菜单被选择项

@@ -12,13 +12,17 @@
 #include "MyButton.h"
 #include "MyList.h"
 #include "MyMenu.h"
+
 #include "EditDlg.h"
 #include "License-plate-number-inquiry-systemDlg.h"
+
+#include "plate_number.h"
+#include "sort.h"
+
 #include "Commonfunction.h"
 #include "Backgound.h"
 #include <gdiplus.h>
 #pragma comment(lib,"gdiplus.lib")
 #include <iostream> 
 #include <fstream> 
-using namespace std;
 #endif //PCH_H
