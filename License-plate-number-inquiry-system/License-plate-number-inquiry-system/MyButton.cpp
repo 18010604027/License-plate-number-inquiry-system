@@ -12,6 +12,11 @@ CMyButton::CMyButton()
 	round = 0;
 
 	bkGound = &_background;
+
+	m_bOver = false;
+	m_bDown = false;
+	m_bDisable = true;
+	m_bTracking = false;
 }
 CMyButton::~CMyButton()
 {

@@ -14,7 +14,8 @@ IMPLEMENT_DYNAMIC(EditDlg, CDialogEx)
 EditDlg::EditDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DIALOG1, pParent)
 {
-
+	m_background = NULL;
+	mFont = NULL;
 }
 
 EditDlg::~EditDlg()

@@ -77,7 +77,11 @@ LRESULT WINAPI MenuWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 }
 
 IMPLEMENT_DYNAMIC(CMyMenu, CMenu)
-
+CMyMenu::CMyMenu()
+	:CMenu()
+{
+	m_bRemoveBorder = false;
+}
 CMyMenu::~CMyMenu()
 {
 	UnhookWindowsHookEx(g_hook);
@@ -92,7 +96,7 @@ void CMyMenu::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
 	CDC* pDC = CDC::FromHandle(lpDrawItemStruct->hDC);
 	CRect rect(lpDrawItemStruct->rcItem);
-	CRect rect2=rect;
+	CRect rect2 = rect;
 	/*CString str;
 	if (lpDrawItemStruct->itemID)
 	{
@@ -114,7 +118,7 @@ void CMyMenu::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 	pDC->SetBkMode(TRANSPARENT);
 	rect.left += 22;
-	CString str= ((MENUDATA*)(lpDrawItemStruct->itemData))->menuText;
+	CString str = ((MENUDATA*)(lpDrawItemStruct->itemData))->menuText;
 	pDC->DrawText(str, rect, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
 }
 

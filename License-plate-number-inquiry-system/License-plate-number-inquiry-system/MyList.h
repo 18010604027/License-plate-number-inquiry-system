@@ -39,10 +39,9 @@ protected://列表状态
 protected://列表属性
 	int total_page;//总页数
 	int page_options;//一页选项数
-	const int box_height = 30;//选框高度	
+	Gdiplus::REAL box_height;//选框高度	
 	CRect crect;//控件矩形
 	Rect rect;//控件矩形
-	Image* img_background;//背景
 protected://图层
 	CDC dc; CBitmap dc_bmp; //缓存
 	Bitmap* layer_background;//背景图层

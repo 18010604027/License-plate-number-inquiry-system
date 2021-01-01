@@ -4,20 +4,26 @@
 IMPLEMENT_DYNAMIC(CMyList, CWnd)//声明控件
 CMyList::CMyList()
 {
-	initialization = false;
-	draw_dc = true;
-	img_background = Gdiplus::Image::FromFile(L"bmp\\背景色.bmp");
-	option_num = -1;
-	menu_num = -1;
-	mouse_focus = false;
-	l_click = false;
+	initialization = false;//是否已初始化
+	draw_dc = true;//是否需要绘画缓冲
+	option_num = -1;//被选中项
+	menu_num = -1;//菜单打开项
+	mouse_focus = false;//是否获得鼠标焦点
+	l_click = false;//鼠标左键是否被按下
 
-	space_len = 0;
+	space_len = 0;//当前存放数据长度
 
-	now_page = 1;
-	total_page = 2;
+	now_page = 1;//当前页数
+	total_page = 2;//总页数
+	page_options = 5;//每页选项数
 
-	page_options = 5;
+	layer_background = NULL;//背景图层
+	layer_text = NULL;//文字图层
+	layer_select_box = NULL;//选框图层
+	layer_select_box_click = NULL;//选框图层（单击）
+	layer_menu = NULL;//菜单图层
+
+	box_height = 30;//选框高度
 }
 
 CMyList:: ~CMyList()
@@ -82,7 +88,7 @@ void CMyList::OnMouseMove(UINT nFlags, CPoint point)
 		tme.dwHoverTime = 13;//HOVER_DEFAULT// 若不设此参数，则无法触发mouseHover
 		mouse_focus = (bool)_TrackMouseEvent(&tme);
 	}
-	option_num = point.y / box_height - 1;
+	option_num = point.y / (int)box_height - 1;
 	Draw();
 	Drawrefresh();
 }
@@ -205,8 +211,8 @@ void CMyList::Initialize()//初始化
 	layer_text = new Bitmap(rect.Width, rect.Height);
 
 	//初始化选框图层	
-	layer_select_box = new Bitmap(rect.Width, box_height);
-	layer_select_box_click = new Bitmap(rect.Width, box_height);
+	layer_select_box = new Bitmap(rect.Width, int(box_height));
+	layer_select_box_click = new Bitmap(rect.Width, int(box_height));
 
 	//初始化选框图层菜单	
 	layer_menu = new Bitmap(50, 100);
@@ -240,8 +246,8 @@ void CMyList::Reinitialize()//重置大小参数
 	//重置选框图层
 	delete layer_select_box;
 	delete layer_select_box_click;
-	layer_select_box = new Bitmap(rect.Width, box_height);
-	layer_select_box_click = new Bitmap(rect.Width, box_height);
+	layer_select_box = new Bitmap(rect.Width, (int)box_height);
+	layer_select_box_click = new Bitmap(rect.Width, (int)box_height);
 
 	/*绘制图层*/
 	DrawBackground();
@@ -281,20 +287,20 @@ void CMyList::DrawTexts()//画文字
 	Gdiplus::SolidBrush blackBrush(Color(255, 255, 255, 255));
 
 	//打印属性
-	int len = rect.Width / title_len;
+	Gdiplus::REAL len = (Gdiplus::REAL)rect.Width / title_len;
 	for (int i = 0; i < title_len; i++)
 	{
-		g.DrawString(titles[i], titles[i].GetLength(), &myFont, RectF(i * len, 0, len, box_height), &font_attribute, &blackBrush);
+		g.DrawString(titles[i], titles[i].GetLength(), &myFont, Gdiplus::RectF(i * len, 0, len, box_height), &font_attribute, &blackBrush);
 	}
 
 	//打印页数
 	font_attribute.SetAlignment(Gdiplus::StringAlignmentCenter);
 	CString prin_page;
 	prin_page.Format(L"%d/%d", now_page, total_page);
-	g.DrawString(prin_page, prin_page.GetLength(), &myFont, RectF(2, rect.Height - box_height, rect.Width, box_height), &font_attribute, &blackBrush);
-	
+	g.DrawString(prin_page, prin_page.GetLength(), &myFont, Gdiplus::RectF(2, (Gdiplus::REAL)(rect.Height - box_height), (Gdiplus::REAL)rect.Width, box_height), &font_attribute, &blackBrush);
+
 	//打印内容
-	Gdiplus::Font myFont2(L"宋体", 10); 
+	Gdiplus::Font myFont2(L"宋体", 10);
 	font_attribute.SetAlignment(Gdiplus::StringAlignmentNear);
 	g.SetTextRenderingHint(Gdiplus::TextRenderingHintClearTypeGridFit);//文字模式
 	for (int i = 0; i + page_options * (now_page - 1) < space_len && i < page_options; i++)
@@ -306,7 +312,7 @@ void CMyList::DrawTexts()//画文字
 		}
 	}
 
-	
+
 }
 
 void CMyList::DrawSelectBox()
@@ -317,7 +323,7 @@ void CMyList::DrawSelectBox()
 	g.SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
 	//画矩形
 	Gdiplus::SolidBrush brush(Color(20, 127, 255, 170));
-	g.FillRectangle(&brush, Rect(0, 0, rect.Width, box_height));
+	g.FillRectangle(&brush, RectF(0, 0, (Gdiplus::REAL)rect.Width, box_height));
 
 	/*单击时选框层*/
 	Gdiplus::Graphics g2(layer_select_box_click);
@@ -325,7 +331,7 @@ void CMyList::DrawSelectBox()
 	g2.SetCompositingMode(Gdiplus::CompositingModeSourceCopy);
 	//画矩形
 	Gdiplus::SolidBrush brush2(Color(80, 127, 255, 170));
-	g2.FillRectangle(&brush2, Rect(0, 0, rect.Width, box_height));
+	g2.FillRectangle(&brush2, RectF(0, 0, (Gdiplus::REAL)rect.Width, box_height));
 }
 
 void CMyList::Draw()
@@ -349,11 +355,11 @@ void CMyList::Draw()
 	{
 		if (l_click)
 		{
-			g.DrawImage(layer_select_box_click, 0, (option_num + 1) * box_height);
+			g.DrawImage(layer_select_box_click, (Gdiplus::REAL)0, (option_num + 1) * box_height);
 		}
 		else
 		{
-			g.DrawImage(layer_select_box, 0, (option_num + 1) * box_height);
+			g.DrawImage(layer_select_box, (Gdiplus::REAL)0, (option_num + 1) * box_height);
 		}
 	}
 	//画文字

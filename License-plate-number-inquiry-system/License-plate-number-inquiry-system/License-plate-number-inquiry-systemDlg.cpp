@@ -20,6 +20,8 @@ ULONG_PTR m_uGdiplusToken;
 CLicenseplatenumberinquirysystemDlg::CLicenseplatenumberinquirysystemDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_LICENSEPLATENUMBERINQUIRYSYSTEM_DIALOG, pParent)
 {
+	mFont = NULL;
+	imgBackground = NULL;
 	//加载GDI+
 	Gdiplus::GdiplusStartup(&m_uGdiplusToken, &m_GdiplusStarupInput, nullptr);
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
