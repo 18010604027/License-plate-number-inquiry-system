@@ -20,6 +20,8 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 protected:
 	Bitmap* m_background;
+	CFont* mFont;
+
 	CString caption_txt;
 	CString id;
 	CString name;

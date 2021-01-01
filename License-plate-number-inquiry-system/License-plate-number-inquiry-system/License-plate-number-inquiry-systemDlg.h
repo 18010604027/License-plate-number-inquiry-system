@@ -60,6 +60,7 @@ protected:
 protected:
 	CRect m_rect;//窗口大小
 	Image* imgBackground;//背景
+	CFont* mFont;//字体(标题用)
 protected:
 	void AdjustSize(LPRECT pRect);//调整窗口控件位置
 	void RefreshAll();//全体刷新

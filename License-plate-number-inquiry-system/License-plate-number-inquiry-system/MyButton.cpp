@@ -159,7 +159,7 @@ void CMyButton::DrawButton(HDC hDestDC)
 	g.DrawImage(*bkGound, -pt.x, -pt.y);
 	//-------------------------------------------------------------
 	int nAlpha = 100;//0--255
-	COLORREF bkColor=m_bkColor;
+	COLORREF bkColor = m_bkColor;
 	int nOffset = 0;
 	if (m_bDisable)
 	{
@@ -181,17 +181,17 @@ void CMyButton::DrawButton(HDC hDestDC)
 	HBRUSH hbr = CreateSolidBrush(bkColor);
 	FillRect(hMaskDC, &rc, hbr);
 	DeleteObject(hbr);
-	
+
 	BLENDFUNCTION blend;
 	memset(&blend, 0, sizeof(blend));
 	blend.BlendOp = AC_SRC_OVER;
 	blend.SourceConstantAlpha = nAlpha; // 透明度 最大255
-	HRGN hRgn = CreateRoundRectRgn(0, 0, nWindth, nHeight,round,round);
+	HRGN hRgn = CreateRoundRectRgn(0, 0, nWindth, nHeight, round * nHeight / nWindth, round);
 	SelectClipRgn(hDC, hRgn);
 	AlphaBlend(hDC, 0, 0, nWindth, nHeight, hMaskDC, 0, 0, nWindth, nHeight, blend);
 	CString strText;
 	GetWindowText(strText);
-	if (strText != _T("")) 
+	if (strText != _T(""))
 	{
 		rc.InflateRect(-2, -2);
 		rc.OffsetRect(nOffset, nOffset);

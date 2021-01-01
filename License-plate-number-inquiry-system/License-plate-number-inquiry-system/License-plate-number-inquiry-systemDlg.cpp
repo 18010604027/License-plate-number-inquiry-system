@@ -369,12 +369,13 @@ void CLicenseplatenumberinquirysystemDlg::AdjustSize(LPRECT pRect)
 	combo.MoveWindow(rect, false);
 
 	//搜索编辑框
-	rect.left = rect.right + 10;
+	rect.left = rect.right;
 	rect.right = rect.left + 250;
+	rect.bottom -= 2;
 	search_edit.MoveWindow(rect, false);
 
 	//搜索按钮
-	rect.left = rect.right + 20;
+	rect.left = rect.right;
 	rect.right = rect.left + 60;
 	search_button.MoveWindow(rect, false);
 
@@ -443,6 +444,24 @@ BOOL CLicenseplatenumberinquirysystemDlg::OnEraseBkgnd(CDC* pDC)
 
 void CLicenseplatenumberinquirysystemDlg::SetControl()
 {
+	//创建新的字体
+	mFont = new CFont;
+	mFont->CreateFont(22,			// 字体高度
+		0,							// 字体宽度
+		0,							// 字体倾斜角
+		0,							// 字体倾斜角
+		FW_EXTRALIGHT,				// 字体的粗细
+		FALSE,						// 字体是否为斜体
+		FALSE,						// 字体是否有下划线
+		0,							// 字体是否有删除线
+		ANSI_CHARSET,				// 字体使用的字符集
+		OUT_DEFAULT_PRECIS,			// 指定如何选择合适的字体
+		CLIP_DEFAULT_PRECIS,		// 确定裁剪的精度
+		DEFAULT_QUALITY,			// 怎么样跟选择的字体相符合
+		DEFAULT_PITCH | FF_SWISS,	// 间距标志和属性标志
+		_T("楷体"));				// 字体的名称
+	caption.SetFont(mFont, true);
+
 	search_button.SetDiaphaneity(180, 220, 110);
 	search_button.SetBkColor(RGB(128, 128, 128));
 	search_button.SetBkColorClick(RGB(105, 105, 105));
@@ -523,6 +542,7 @@ void CLicenseplatenumberinquirysystemDlg::OnDestroy()
 	CDialogEx::OnDestroy();
 
 	// TODO: 在此处添加消息处理程序代码
+	//存放窗口位置数据
 	CRect pRect;
 	ofstream outfile;
 	outfile.open("Data\\windows", std::ios::binary);
@@ -534,7 +554,6 @@ void CLicenseplatenumberinquirysystemDlg::OnDestroy()
 	{
 		GetWindowRect(pRect);
 	}
-
 	if (outfile)
 	{
 		const int len = sizeof(int);
@@ -545,6 +564,8 @@ void CLicenseplatenumberinquirysystemDlg::OnDestroy()
 		outfile.write((char*)&pRect.right, len);
 	}
 	outfile.close();
+	//清理申请空间
+	delete mFont;
 }
 
 

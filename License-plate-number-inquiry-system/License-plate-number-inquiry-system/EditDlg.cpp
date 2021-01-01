@@ -19,6 +19,7 @@ EditDlg::EditDlg(CWnd* pParent /*=nullptr*/)
 
 EditDlg::~EditDlg()
 {
+	delete mFont;
 }
 
 void EditDlg::DoDataExchange(CDataExchange* pDX)
@@ -131,6 +132,23 @@ HBRUSH EditDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 
 void EditDlg::SetControl()
 {
+	mFont = new CFont;
+	mFont->CreateFont(18,			// 字体高度
+		0,							// 字体宽度
+		0,							// 字体倾斜角
+		0,							// 字体倾斜角
+		FW_EXTRALIGHT,				// 字体的粗细
+		FALSE,						// 字体是否为斜体
+		FALSE,						// 字体是否有下划线
+		0,							// 字体是否有删除线
+		ANSI_CHARSET,				// 字体使用的字符集
+		OUT_DEFAULT_PRECIS,			// 指定如何选择合适的字体
+		CLIP_DEFAULT_PRECIS,		// 确定裁剪的精度
+		DEFAULT_QUALITY,			// 怎么样跟选择的字体相符合
+		DEFAULT_PITCH | FF_SWISS,	// 间距标志和属性标志
+		_T("楷体"));				// 字体的名称
+	caption.SetFont(mFont, true);
+
 	exit_button.SetBkColorClick(RGB(255, 0, 0));
 	exit_button.SetBkGound(&m_background);
 	ok_button.SetBkGound(&m_background);

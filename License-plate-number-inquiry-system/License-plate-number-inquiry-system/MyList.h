@@ -33,7 +33,6 @@ protected://列表状态
 	int now_page;//当前页数
 	bool mouse_focus;//鼠标焦点
 	bool l_click;//鼠标左键按下
-	bool menu_focus;//菜单焦点
 	bool initialization;//是否已初始化
 	bool draw_dc;//是否绘画缓存
 	bool refresh = false;//是否进行位置刷新
