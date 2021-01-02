@@ -30,6 +30,7 @@ public://消息区
 protected://列表内容
 	CString titles[10]; int title_len = 0;//列表各标题（列表属性）
 	plate_number list_data; int space_len;//列表数据
+	struct ListNum* list_num;
 protected://列表状态
 	int option_num;//该页被选项
 	int menu_num;//菜单被选择项
@@ -63,4 +64,6 @@ protected://绘画功能
 protected://列表功能
 	void ChangePage(bool next);//改变页数
 	void MenuChange();//编辑选项
+public:
+	void Search(CString str);
 };

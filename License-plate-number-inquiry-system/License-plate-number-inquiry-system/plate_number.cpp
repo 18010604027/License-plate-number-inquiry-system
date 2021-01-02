@@ -105,6 +105,8 @@ void plate_number::plate_read(char filename[])
 			pnode1->data->name = name.c_str();
 			pnode1->data->place = place.c_str();
 			pnode1->data->phone = phone.c_str();
+			/*static int mm = 0;
+			PutDebug(L"%s %d\n", pnode1->data->name, mm++);*/
 			while (pnode2->next != NULL)//让pnode2指向链表的最后一个
 			{
 				pnode2 = pnode2->next;
@@ -249,4 +251,38 @@ int plate_number::count()
 	}
 	return i;
 
+}
+
+//template <class T>
+//T plate_number::Search(T(*visit)(va_list arg_ptr), ...)
+//{
+//	va_list arg_ptr;
+//	va_start(arg_ptr, visit);
+//	return visit(arg_ptr);
+//}
+struct ListNum* plate_number::Search(bool(*visit)(CString, CString), CString sub, int& num)
+{
+	int i = 0;
+	num = 0;
+	plate_node* head_temp = head->next;
+	struct ListNum* list_num = new struct ListNum;
+	struct ListNum* p = list_num;
+	while (head_temp != NULL)
+	{
+		plate_data* data = head_temp->data;
+		CString plate;
+		plate.Format(L"%s%c%d%d%d%d%d", data->province, data->city, data->num_one, data->num_two, data->num_three, data->num_four, data->num_five);
+		
+		if (visit(plate, sub))
+		{
+			p->next = new struct ListNum;
+			p = p->next;
+			p->num = i;
+			num++;
+		}
+		head_temp = head_temp->next;
+		i++;
+	}
+	p->next = NULL;
+	return list_num;
 }

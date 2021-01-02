@@ -187,6 +187,7 @@
     <ClInclude Include="Commonfunction.h" />
     <ClInclude Include="EditDlg.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="kmp.h" />
     <ClInclude Include="License-plate-number-inquiry-system.h" />
     <ClInclude Include="License-plate-number-inquiry-systemDlg.h" />
     <ClInclude Include="MyButton.h" />
@@ -202,6 +203,7 @@
     <ClCompile Include="Background.cpp" />
     <ClCompile Include="Commonfunction.cpp" />
     <ClCompile Include="EditDlg.cpp" />
+    <ClCompile Include="kmp.cpp" />
     <ClCompile Include="License-plate-number-inquiry-system.cpp" />
     <ClCompile Include="License-plate-number-inquiry-systemDlg.cpp" />
     <ClCompile Include="MyButton.cpp" />

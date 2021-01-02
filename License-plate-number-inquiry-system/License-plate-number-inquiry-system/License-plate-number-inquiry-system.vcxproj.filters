@@ -57,6 +57,9 @@
     <ClInclude Include="sort.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="kmp.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="License-plate-number-inquiry-system.cpp">
@@ -87,6 +90,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="plate_number.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="kmp.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

@@ -18,6 +18,7 @@
 
 #include "plate_number.h"
 
+#include "kmp.h"
 #include "sort.h"
 
 #include "Commonfunction.h"

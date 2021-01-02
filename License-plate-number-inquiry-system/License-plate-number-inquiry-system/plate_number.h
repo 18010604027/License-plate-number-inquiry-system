@@ -1,6 +1,13 @@
 #pragma once
 #include<string>
 using namespace std;
+
+struct ListNum
+{
+	int num;
+	struct ListNum* next;
+};
+
 struct plate_data
 {
 	CString province = NULL;//第一位的省级
@@ -40,7 +47,9 @@ public:
 	void _delete(plate_node* p1);
 	void _quick_sort();
 	void plate_write();
-	void remain(int(*visit)) {};
+	//template <class T>
+	//T Search(T(*visit)(va_list arg_ptr), ...) ;
+	struct ListNum* Search(bool(*visit)(CString, CString), CString sub, int& num);
 	int count();
 	~plate_number();
 	plate_node* head;

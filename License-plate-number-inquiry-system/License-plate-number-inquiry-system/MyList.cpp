@@ -38,6 +38,7 @@ CMyList::CMyList()
 			total_page = 1;
 		}
 	}
+	list_num = NULL;
 }
 
 CMyList:: ~CMyList()
@@ -146,7 +147,7 @@ void CMyList::OnLButtonUp(UINT nFlags, CPoint point)
 	l_click = false;
 	Draw();
 	Drawrefresh();
-	
+
 }
 
 void CMyList::OnRButtonDown(UINT nFlags, CPoint point)
@@ -211,7 +212,7 @@ BOOL CMyList::OnEraseBkgnd(CDC* pDC)
 
 void CMyList::OnDropFiles(HDROP hDropInfo)
 {
-	WCHAR szFilePath[256];
+	WCHAR szFilePath[1024];
 	UINT count;
 	count = DragQueryFile(hDropInfo, 0xFFFFFFFF, NULL, 0); //获取拖拽文件数
 
@@ -219,7 +220,7 @@ void CMyList::OnDropFiles(HDROP hDropInfo)
 	{
 		DragQueryFile(hDropInfo, i, szFilePath, sizeof(szFilePath)); //获取文件路径
 		DWORD dwNum;
-		CHAR psText[256];
+		CHAR psText[1024];
 		dwNum = sizeof(szFilePath);
 		WideCharToMultiByte(CP_OEMCP, NULL, szFilePath, -1, psText, dwNum, NULL, FALSE);
 		list_data.plate_read(psText);
@@ -367,16 +368,41 @@ void CMyList::DrawTexts()//画文字
 	Gdiplus::Font myFont2(L"宋体", 10);
 	font_attribute.SetAlignment(Gdiplus::StringAlignmentNear);
 	g.SetTextRenderingHint(Gdiplus::TextRenderingHintClearTypeGridFit);//文字模式
-	for (int i = 0; i + page_options * (now_page - 1) < space_len && i < page_options; i++)
+	if (list_num)
 	{
+		struct ListNum* p;
+		p = list_num->next;
+		for (int i = 0; i < page_options * (now_page - 1); i++)
+		{
+			p = p->next;
+		}
+		for (int i = 0; p && i < page_options; i++, p = p->next)
+		{
+			plate_data* data;
+			data = list_data.return_num(p->num + 1)->data;
+			CString plate;
+			plate.Format(L"%s%c%d%d%d%d%d", data->province, data->city, data->num_one, data->num_two, data->num_three, data->num_four, data->num_five);
+			g.DrawString(plate, plate.GetLength(), &myFont2, RectF(2 + 0 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
+			g.DrawString(data->name, data->name.GetLength(), &myFont2, RectF(2 + 1 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
+			g.DrawString(data->place, data->place.GetLength(), &myFont2, RectF(2 + 2 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
+			g.DrawString(data->phone, data->phone.GetLength(), &myFont2, RectF(2 + 3 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
+		}
 
-		plate_data* data = list_data.return_num(i + page_options * (now_page - 1) + 1)->data;
-		CString plate;
-		plate.Format(L"%s%c%d%d%d%d%d", data->province, data->city, data->num_one, data->num_two, data->num_three, data->num_four, data->num_five);
-		g.DrawString(plate, plate.GetLength(), &myFont2, RectF(2 + 0 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
-		g.DrawString(data->name, data->name.GetLength(), &myFont2, RectF(2 + 1 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
-		g.DrawString(data->place, data->place.GetLength(), &myFont2, RectF(2 + 2 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
-		g.DrawString(data->phone, data->phone.GetLength(), &myFont2, RectF(2 + 3 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
+	}
+	else
+	{
+		for (int i = 0; i + page_options * (now_page - 1) < space_len && i < page_options; i++)
+		{
+			plate_data* data;
+			data = list_data.return_num(i + page_options * (now_page - 1) + 1)->data;
+			CString plate;
+			plate.Format(L"%s%c%d%d%d%d%d", data->province, data->city, data->num_one, data->num_two, data->num_three, data->num_four, data->num_five);
+			g.DrawString(plate, plate.GetLength(), &myFont2, RectF(2 + 0 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
+			g.DrawString(data->name, data->name.GetLength(), &myFont2, RectF(2 + 1 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
+			g.DrawString(data->place, data->place.GetLength(), &myFont2, RectF(2 + 2 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
+			g.DrawString(data->phone, data->phone.GetLength(), &myFont2, RectF(2 + 3 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
+		}
+
 	}
 
 
@@ -465,7 +491,21 @@ void CMyList::MenuChange()
 {
 	EditDlg dlg;
 	dlg.SetCaption(L"编辑");
-	plate_data* data = list_data.return_num(page_options * (now_page - 1)+menu_num + 1)->data;
+	plate_data* data;
+	if (list_num)
+	{
+		struct ListNum* p;
+		p = list_num->next;
+		for (int i = 0; i < page_options * (now_page - 1) + menu_num; i++)
+		{
+			p = p->next;
+		}
+		data = list_data.return_num(p->num + 1)->data;
+	}
+	else
+	{
+		data = list_data.return_num(page_options * (now_page - 1) + menu_num + 1)->data;
+	}
 	CString plate;
 	plate.Format(L"%s%c%d%d%d%d%d", data->province, data->city, data->num_one, data->num_two, data->num_three, data->num_four, data->num_five);
 	dlg.SetData(4,
@@ -511,8 +551,25 @@ BOOL CMyList::OnCommand(WPARAM wParam, LPARAM lParam)
 	}
 	if (uMsg == WM_MENU_DELETE)
 	{
-
+		//list_data._delete(page_options * (now_page - 1) + menu_num + 1);
 	}
 
 	return CWnd::OnCommand(wParam, lParam);
+}
+
+void CMyList::Search(CString str)
+{
+	if (list_num)
+	{
+		delete list_num;
+	}
+	list_num = list_data.Search(kmp, str, space_len);
+	total_page = space_len / page_options + (space_len % page_options ? 1 : 0);
+	if (total_page == 0)
+	{
+		total_page = 1;
+	}
+	DrawTexts();
+	Draw();
+	Drawrefresh();
 }

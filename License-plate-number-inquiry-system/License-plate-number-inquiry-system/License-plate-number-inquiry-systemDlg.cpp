@@ -526,7 +526,9 @@ void CLicenseplatenumberinquirysystemDlg::InitializedData()
 void CLicenseplatenumberinquirysystemDlg::OnBnClickedSearch()
 {
 	// TODO: 在此添加控件通知处理程序代码
-
+	CString str;	
+	search_edit.GetWindowTextW(str);
+	list.Search(str);
 }
 
 
