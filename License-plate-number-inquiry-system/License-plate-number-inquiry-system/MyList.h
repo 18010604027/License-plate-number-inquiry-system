@@ -1,4 +1,5 @@
 #pragma once
+#include"plate_number.h"
 using namespace Gdiplus;
 
 #define WM_MENU_ADD 11990
@@ -16,18 +17,19 @@ public://消息区
 	virtual BOOL OnCommand(WPARAM wParam, LPARAM lParam);
 	afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	afx_msg void OnDropFiles(HDROP hDropInfo);
 	afx_msg LRESULT OnMouseLeave(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnMouseHover(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnMouseHover(WPARAM wParam, LPARAM lParam);	
 	DECLARE_MESSAGE_MAP()//消息必加
 protected://列表内容
 	CString titles[10]; int title_len = 0;//列表各标题（列表属性）
-	CString list_space[10][10]; int space_len = 0;//列表各项
-	plate_number list_data;
+	plate_number list_data; int space_len;//列表数据
 protected://列表状态
 	int option_num;//该页被选项
 	int menu_num;//菜单被选择项

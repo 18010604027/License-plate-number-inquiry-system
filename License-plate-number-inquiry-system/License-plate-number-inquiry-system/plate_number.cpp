@@ -56,7 +56,6 @@ int plate_node::operator >(const plate_node& c2) const
 
 plate_number::plate_number()
 {
-
 	head = new plate_node;//注意，开辟空间不可以用malloc来开辟空间
 	head->data = new plate_data;
 	//头空间不放任何数据
@@ -72,16 +71,25 @@ void plate_number::clear_plate_num()
 
 void plate_number::plate_read(char filename[])
 {
-	char temp;//用来帮助判断有没有读到文件尾
+
+	string name;
+	string place;
+	string phone;
+	string province;//用来帮助判断有没有读到文件尾
+
 	plate_node* pnode1 = NULL;
 	plate_node* pnode2 = NULL;
 	pnode2 = head;
 
 	fstream fin;
 	fin.open(filename, ios_base::in);//别忘了写.txt，别烦这种低级错误
+	if (!fin)
+	{
+		return;
+	}
 	while (1)
 	{
-		fin >> temp;
+		fin >> province;
 		if (fin.eof())
 		{
 			break;
@@ -91,9 +99,12 @@ void plate_number::plate_read(char filename[])
 			//cout << "读文件一次" << endl;
 			pnode1 = new plate_node; pnode1->data = new plate_data; pnode1->next = NULL; pnode1->pre = NULL;
 			//别错写成pnode2->next = NULL;别烦这种低级错误，否则会极大消耗内存
-			pnode1->data->province = temp;
+			pnode1->data->province = province.c_str();
 			fin >> pnode1->data->city >> pnode1->data->num_one >> pnode1->data->num_two >> pnode1->data->num_three >> pnode1->data->num_four >> pnode1->data->num_five;
-			fin >> pnode1->data->name >> pnode1->data->place >> pnode1->data->phone;
+			fin >> name >> place >> phone;
+			pnode1->data->name = name.c_str();
+			pnode1->data->place = place.c_str();
+			pnode1->data->phone = phone.c_str();
 			while (pnode2->next != NULL)//让pnode2指向链表的最后一个
 			{
 				pnode2 = pnode2->next;
@@ -109,10 +120,21 @@ void plate_number::printfList()
 	plate_node* temp = NULL;
 	temp = head;
 	temp = temp->next;
+
+	string province;
+	string name;
+	string place;
+	string phone;
+
 	while (temp != NULL)
 	{
-		cout << temp->data->province << temp->data->city << temp->data->num_one << temp->data->num_two << temp->data->num_three << temp->data->num_four << temp->data->num_five << endl;
-		cout << temp->data->name << " " << temp->data->place << " " << temp->data->phone << endl;
+		province = CT2A(temp->data->province.GetString());
+		name = CT2A(temp->data->name.GetString());
+		place = CT2A(temp->data->place.GetString());
+		phone = CT2A(temp->data->phone.GetString());
+
+		cout << province << temp->data->city << temp->data->num_one << temp->data->num_two << temp->data->num_three << temp->data->num_four << temp->data->num_five << endl;
+		cout << name << " " << place << " " << phone << endl;
 		temp = temp->next;
 	}
 }
@@ -130,9 +152,18 @@ plate_node* plate_number::return_num(int x)
 	return head_temp;
 }
 
-void plate_number::insert(plate_node* p1)
+void plate_number::insert(CString province, char city, int num_one, int num_two, int num_three, int num_four, int num_five, CString name, CString place, CString phone)
 {
+
 	//插入在头结点之后
+	plate_node* p1 = new plate_node;
+	p1->data = new plate_data;
+	p1->next = NULL;
+	p1->pre = NULL;
+	p1->data->province = province; p1->data->city = city; p1->data->num_one = num_one; p1->data->num_two = num_two; p1->data->num_three = num_three; p1->data->num_four = num_four; p1->data->num_five = num_five;
+
+	p1->data->name = name; p1->data->place = place; p1->data->phone = phone;
+
 	plate_node* head_temp = head;
 	if (head_temp->next == NULL)//链表是不是只有头结点//是==，不是=，别犯这种低级错误
 	{
@@ -146,9 +177,10 @@ void plate_number::insert(plate_node* p1)
 		head_temp->next = p1;
 		p1->pre = head_temp;
 	}
-
+	//delete p1->data;这里不能删了这两个空间
+	//delete p1;这里不能删了这两个空间
 }
-//这个函数还没有调试过
+
 void plate_number::_delete(plate_node* p1)
 {
 	p1->pre->next = p1->next;
@@ -166,14 +198,55 @@ void plate_number::_quick_sort()
 }
 void plate_number::plate_write()
 {
-	fstream fout; fout.open("plate_num.data", ios_base::out);
+	string province;
+	string name;
+	string place;
+	string phone;
+
+	fstream fout; fout.open("Data\\plate_num.data", ios_base::out);
 	plate_node* pnode = NULL;
 	pnode = head->next;
 	while (pnode != NULL)
 	{
-		fout << pnode->data->province << " " << pnode->data->city << " " << pnode->data->num_one << " " << pnode->data->num_two << " " << pnode->data->num_three << " " << pnode->data->num_four << " " << pnode->data->num_five << endl;
-		fout << pnode->data->name << " " << pnode->data->place << " " << pnode->data->phone << endl;
+		province = CT2A(pnode->data->province.GetString());
+		name = CT2A(pnode->data->name.GetString());
+		place = CT2A(pnode->data->place.GetString());
+		phone = CT2A(pnode->data->phone.GetString());
+
+		fout << province << " " << pnode->data->city << " " << pnode->data->num_one << " " << pnode->data->num_two << " " << pnode->data->num_three << " " << pnode->data->num_four << " " << pnode->data->num_five << endl;
+		fout << name << " " << place << " " << phone << endl;
 		pnode = pnode->next;
 	}
 	fout.close();
+}
+plate_number::~plate_number()
+{
+
+	plate_node* head_temp = head;
+	while (head_temp->next != NULL)
+	{
+		head_temp = head_temp->next;
+	}
+	while (head_temp->pre != NULL)
+	{
+		delete head_temp->data;
+		head_temp = head_temp->pre;
+		delete head_temp->next;
+	}
+	delete head_temp->data;
+	delete head_temp;
+
+}
+
+int plate_number::count()
+{
+	int i = 0;
+	plate_node* head_temp = head->next;
+	while (head_temp != NULL)
+	{
+		head_temp = head_temp->next;
+		i++;
+	}
+	return i;
+
 }

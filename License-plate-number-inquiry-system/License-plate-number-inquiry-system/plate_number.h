@@ -3,16 +3,16 @@
 using namespace std;
 struct plate_data
 {
-	char province = NULL;//第一位的省级
+	CString province = NULL;//第一位的省级
 	char city = NULL;	  //第二级的市级
 	int	num_one = NULL;  //后面的五位数
 	int num_two = NULL;  //后面的五位数
 	int num_three = NULL;//后面的五位数
 	int num_four = NULL; //后面的五位数
 	int num_five = NULL; //后面的五位数
-	string name = "";  //车主姓名
-	string place = ""; //车主地址
-	string phone = ""; //车主电话
+	CString name = L"";  //车主姓名
+	CString place = L""; //车主地址
+	CString phone = L""; //车主电话
 };
 typedef struct plate_node
 {
@@ -36,11 +36,12 @@ public:
 	void plate_read(char filename[]);
 	void printfList();
 	plate_node* return_num(int x);
-	void insert(plate_node* p1);
+	void insert(CString province, char city, int num_one, int num_two, int num_three, int num_four, int num_five, CString name, CString place, CString phone);
 	void _delete(plate_node* p1);
 	void _quick_sort();
 	void plate_write();
 	void remain(int(*visit)) {};
-	~plate_number() {};
+	int count();
+	~plate_number();
 	plate_node* head;
 };

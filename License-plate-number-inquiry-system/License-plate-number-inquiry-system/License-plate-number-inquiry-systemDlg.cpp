@@ -481,7 +481,7 @@ void CLicenseplatenumberinquirysystemDlg::SetControl()
 	list.AddProverty(L"地址");
 	list.AddProverty(L"联系方式");
 
-	list.AddItem(4, L"123321", L"刘", L"天堂", L"1243213121");
+	//list.AddItem(4, L"123321", L"刘", L"天堂", L"1243213121");
 }
 
 void CLicenseplatenumberinquirysystemDlg::InitializedData()

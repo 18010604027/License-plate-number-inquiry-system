@@ -4,6 +4,8 @@
 IMPLEMENT_DYNAMIC(CMyList, CWnd)//声明控件
 CMyList::CMyList()
 {
+
+
 	initialization = false;//是否已初始化
 	draw_dc = true;//是否需要绘画缓冲
 	option_num = -1;//被选中项
@@ -14,7 +16,7 @@ CMyList::CMyList()
 	space_len = 0;//当前存放数据长度
 
 	now_page = 1;//当前页数
-	total_page = 2;//总页数
+	total_page = 1;//总页数
 	page_options = 5;//每页选项数
 
 	layer_background = NULL;//背景图层
@@ -23,7 +25,19 @@ CMyList::CMyList()
 	layer_select_box_click = NULL;//选框图层（单击）
 	layer_menu = NULL;//菜单图层
 
-	box_height = 30;//选框高度
+	box_height = 25;//选框高度
+
+	{
+		list_data.plate_read("Data\\plate_num.data");
+		list_data._quick_sort();
+		list_data.plate_write();
+		space_len = list_data.count();
+		total_page = space_len / page_options + (space_len % page_options ? 1 : 0);
+		if (total_page == 0)
+		{
+			total_page = 1;
+		}
+	}
 }
 
 CMyList:: ~CMyList()
@@ -33,12 +47,14 @@ CMyList:: ~CMyList()
 
 BEGIN_MESSAGE_MAP(CMyList, CWnd)
 	ON_WM_MOUSEMOVE()
+	ON_WM_LBUTTONDBLCLK()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_RBUTTONDOWN()
 	ON_WM_SIZE()
 	ON_WM_ERASEBKGND()
 	ON_WM_MOUSEWHEEL()
+	ON_WM_DROPFILES()
 	ON_MESSAGE(WM_MOUSELEAVE, OnMouseLeave)
 	ON_MESSAGE(WM_MOUSEHOVER, OnMouseHover)
 END_MESSAGE_MAP()
@@ -46,7 +62,7 @@ END_MESSAGE_MAP()
 
 void CMyList::AddItem(int i, ...)//增加列表选项 
 {
-	LPCWSTR str = 0;
+	/*LPCWSTR str = 0;
 	va_list arg_ptr;
 	va_start(arg_ptr, i);
 	int j = 0;
@@ -56,7 +72,7 @@ void CMyList::AddItem(int i, ...)//增加列表选项
 		list_space[space_len][j] = str;
 	}
 	space_len++;
-	va_end(arg_ptr);
+	va_end(arg_ptr);*/
 }
 
 void CMyList::AddProverty(CString Title)
@@ -108,6 +124,15 @@ LRESULT CMyList::OnMouseHover(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
+void CMyList::OnLButtonDblClk(UINT nFlags, CPoint point)
+{
+	if (option_num != -1 && option_num < page_options && option_num + page_options * (now_page - 1) < space_len)
+	{
+		menu_num = option_num;
+		MenuChange();
+	}
+}
+
 void CMyList::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	SetFocus();//获取焦点
@@ -121,11 +146,7 @@ void CMyList::OnLButtonUp(UINT nFlags, CPoint point)
 	l_click = false;
 	Draw();
 	Drawrefresh();
-	if (option_num != -1 && option_num < page_options && option_num + page_options * (now_page - 1) < space_len)
-	{
-		menu_num = option_num;
-		MenuChange();
-	}
+	
 }
 
 void CMyList::OnRButtonDown(UINT nFlags, CPoint point)
@@ -169,6 +190,7 @@ void CMyList::OnSize(UINT nType, int cx, int cy)
 	{
 		refresh = true;
 	}
+
 }
 
 BOOL CMyList::OnEraseBkgnd(CDC* pDC)
@@ -185,6 +207,34 @@ BOOL CMyList::OnEraseBkgnd(CDC* pDC)
 	}
 	Drawrefresh();
 	return true;
+}
+
+void CMyList::OnDropFiles(HDROP hDropInfo)
+{
+	WCHAR szFilePath[256];
+	UINT count;
+	count = DragQueryFile(hDropInfo, 0xFFFFFFFF, NULL, 0); //获取拖拽文件数
+
+	for (int i = count - 1; i >= 0; i--)
+	{
+		DragQueryFile(hDropInfo, i, szFilePath, sizeof(szFilePath)); //获取文件路径
+		DWORD dwNum;
+		CHAR psText[256];
+		dwNum = sizeof(szFilePath);
+		WideCharToMultiByte(CP_OEMCP, NULL, szFilePath, -1, psText, dwNum, NULL, FALSE);
+		list_data.plate_read(psText);
+	}
+	list_data._quick_sort();
+	list_data.plate_write();
+	space_len = list_data.count();
+	total_page = space_len / page_options + (space_len % page_options ? 1 : 0);
+	if (total_page == 0)
+	{
+		total_page = 1;
+	}
+	DrawTexts();
+	Draw();
+	Drawrefresh();
 }
 
 void CMyList::Initialize()//初始化
@@ -217,6 +267,13 @@ void CMyList::Initialize()//初始化
 	//初始化选框图层菜单	
 	layer_menu = new Bitmap(50, 100);
 
+	//设置页面选项数
+	page_options = rect.Height / box_height - 2;
+	total_page = space_len / page_options + (space_len % page_options ? 1 : 0);
+	if (total_page == 0)
+	{
+		total_page = 1;
+	}
 	/*绘制图层*/
 	DrawBackground();
 	DrawSelectBox();
@@ -249,6 +306,13 @@ void CMyList::Reinitialize()//重置大小参数
 	layer_select_box = new Bitmap(rect.Width, (int)box_height);
 	layer_select_box_click = new Bitmap(rect.Width, (int)box_height);
 
+	//设置页面选项数
+	page_options = rect.Height / box_height - 2;
+	total_page = space_len / page_options + (space_len % page_options ? 1 : 0);
+	if (total_page == 0)
+	{
+		total_page = 1;
+	}
 	/*绘制图层*/
 	DrawBackground();
 	DrawSelectBox();
@@ -305,11 +369,14 @@ void CMyList::DrawTexts()//画文字
 	g.SetTextRenderingHint(Gdiplus::TextRenderingHintClearTypeGridFit);//文字模式
 	for (int i = 0; i + page_options * (now_page - 1) < space_len && i < page_options; i++)
 	{
-		CString str;
-		for (int j = 0; j < title_len; j++)
-		{
-			g.DrawString(list_space[i][j], list_space[i][j].GetLength(), &myFont2, RectF(2 + j * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
-		}
+
+		plate_data* data = list_data.return_num(i + page_options * (now_page - 1) + 1)->data;
+		CString plate;
+		plate.Format(L"%s%c%d%d%d%d%d", data->province, data->city, data->num_one, data->num_two, data->num_three, data->num_four, data->num_five);
+		g.DrawString(plate, plate.GetLength(), &myFont2, RectF(2 + 0 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
+		g.DrawString(data->name, data->name.GetLength(), &myFont2, RectF(2 + 1 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
+		g.DrawString(data->place, data->place.GetLength(), &myFont2, RectF(2 + 2 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
+		g.DrawString(data->phone, data->phone.GetLength(), &myFont2, RectF(2 + 3 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
 	}
 
 
@@ -398,17 +465,20 @@ void CMyList::MenuChange()
 {
 	EditDlg dlg;
 	dlg.SetCaption(L"编辑");
+	plate_data* data = list_data.return_num(page_options * (now_page - 1)+menu_num + 1)->data;
+	CString plate;
+	plate.Format(L"%s%c%d%d%d%d%d", data->province, data->city, data->num_one, data->num_two, data->num_three, data->num_four, data->num_five);
 	dlg.SetData(4,
-		list_space[menu_num][0],
-		list_space[menu_num][1],
-		list_space[menu_num][2],
-		list_space[menu_num][3]);
+		plate,
+		data->name,
+		data->place,
+		data->phone);
 	if (dlg.DoModal() == IDOK)
 	{
-		dlg.GetData(list_space[menu_num][0],
+		/*dlg.GetData(list_space[menu_num][0],
 			list_space[menu_num][1],
 			list_space[menu_num][2],
-			list_space[menu_num][3]);
+			list_space[menu_num][3]);*/
 		DrawTexts();
 		Draw();
 		Drawrefresh();

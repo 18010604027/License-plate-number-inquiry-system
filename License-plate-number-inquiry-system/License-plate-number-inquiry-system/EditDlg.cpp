@@ -245,3 +245,4 @@ void EditDlg::GetData(CString& _id, CString& _name, CString& _site, CString& _ph
 	_site = site;
 	_phone = phone;
 }
+
