@@ -29,6 +29,7 @@
 #define IDC_STATIC3                     1017
 #define IDC_STATIC4                     1018
 #define IDC_COMBO1                      1019
+#define IDC_COMBO2                      1020
 
 // Next default values for new objects
 // 

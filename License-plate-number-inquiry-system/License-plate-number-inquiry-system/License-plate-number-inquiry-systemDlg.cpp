@@ -38,6 +38,7 @@ void CLicenseplatenumberinquirysystemDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT1, search_edit);
 	DDX_Control(pDX, SEARCH, search_button);
 	DDX_Control(pDX, IDC_COMBO1, combo);
+	DDX_Control(pDX, IDC_COMBO2, combo_province);
 }
 
 BEGIN_MESSAGE_MAP(CLicenseplatenumberinquirysystemDlg, CDialogEx)
@@ -58,6 +59,7 @@ BEGIN_MESSAGE_MAP(CLicenseplatenumberinquirysystemDlg, CDialogEx)
 	ON_BN_CLICKED(SEARCH, &CLicenseplatenumberinquirysystemDlg::OnBnClickedSearch)
 	ON_WM_GETMINMAXINFO()
 	ON_WM_DESTROY()
+	ON_CBN_SELCHANGE(IDC_COMBO1, &CLicenseplatenumberinquirysystemDlg::OnCbnSelchangeCombo1)
 END_MESSAGE_MAP()
 
 
@@ -370,8 +372,15 @@ void CLicenseplatenumberinquirysystemDlg::AdjustSize(LPRECT pRect)
 	rect.bottom = rect.top + 25;
 	combo.MoveWindow(rect, false);
 
+	//省份下拉列表
+	if (value_province)
+	{
+		rect.left = rect.right + 2;
+		rect.right = rect.left + 110;
+		combo_province.MoveWindow(rect, false);
+	}
 	//搜索编辑框
-	rect.left = rect.right;
+	rect.left = rect.right+2;
 	rect.right = rect.left + 250;
 	rect.bottom -= 2;
 	search_edit.MoveWindow(rect, false);
@@ -472,9 +481,22 @@ void CLicenseplatenumberinquirysystemDlg::SetControl()
 	max_button.SetBkColorClick(RGB(0, 122, 205));
 	exit_button.SetBkColorClick(RGB(255, 0, 0));
 
+	combo.AddString(L"精确查询(省份)");
 	combo.AddString(L"一般查询");
-	combo.AddString(L"正则表达式查询");
+	combo.AddString(L"精确查询");
 	combo.SetCurSel(0);
+
+	const CString province_short[] = { L"云", L"京",L"冀",L"吉",L"宁",L"川",L"新",L"晋",L"桂",L"沪",L"津",L"浙",L"渝",L"港",L"湘",L"澳",
+			L"琼",L"甘",L"皖",L"粤",L"苏",L"蒙",
+			L"藏",L"豫",L"贵",L"赣",L"辽",L"鄂",
+			L"闽",L"陕",L"青",L"鲁",L"黑"
+	};
+	for (int i = 0; i < 33; i++)
+	{
+		combo_province.AddString(province_short[i]);
+	}
+	combo_province.SetCurSel(0);
+	
 
 	list.AddProverty(L"车牌号");
 	list.AddProverty(L"姓名");
@@ -526,9 +548,25 @@ void CLicenseplatenumberinquirysystemDlg::InitializedData()
 void CLicenseplatenumberinquirysystemDlg::OnBnClickedSearch()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	CString str;	
+	CString str, str2;
+	int index = 0;
 	search_edit.GetWindowTextW(str);
-	list.Search(str);
+	combo.GetWindowTextW(str2);
+	if (str2 == L"一般查询")
+	{
+		index = 0;
+	}
+	else if (str2 == L"精确查询")
+	{
+		index = 1;
+	}
+	else if (str2 == L"精确查询(省份)")
+	{
+		index = 2;
+		combo_province.GetWindowTextW(str2);
+		str = str2 + str;
+	}
+	list.Search(str, index);
 }
 
 
@@ -573,8 +611,6 @@ void CLicenseplatenumberinquirysystemDlg::OnDestroy()
 }
 
 
-
-
 BOOL CLicenseplatenumberinquirysystemDlg::PreTranslateMessage(MSG* pMsg)
 {
 	// TODO: 在此添加专用代码和/或调用基类
@@ -595,5 +631,41 @@ BOOL CLicenseplatenumberinquirysystemDlg::PreTranslateMessage(MSG* pMsg)
 
 void CLicenseplatenumberinquirysystemDlg::OnSearchEditDown()
 {
-
+	OnBnClickedSearch();
 }
+
+
+void CLicenseplatenumberinquirysystemDlg::OnCbnSelchangeCombo1()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CString strNew;
+	int nSel = combo.GetCurSel();
+	combo.GetLBText(nSel, strNew);
+	
+	if (strNew == L"精确查询(省份)")
+	{
+		if (!value_province)
+		{
+			value_province = true;
+			combo_province.ShowWindow(TRUE);
+			CRect winrect;
+			GetWindowRect(&winrect);
+			AdjustSize(winrect);
+			RefreshAll();
+		}
+	}
+	else
+	{
+		if (value_province)
+		{
+			value_province = false;
+			combo_province.ShowWindow(FALSE);
+			CRect winrect;
+			GetWindowRect(&winrect);
+			AdjustSize(winrect);
+			RefreshAll();
+		}
+	}
+}
+
+

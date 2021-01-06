@@ -25,7 +25,7 @@ public://消息区
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnDropFiles(HDROP hDropInfo);
 	afx_msg LRESULT OnMouseLeave(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnMouseHover(WPARAM wParam, LPARAM lParam);	
+	afx_msg LRESULT OnMouseHover(WPARAM wParam, LPARAM lParam);
 	DECLARE_MESSAGE_MAP()//消息必加
 protected://列表内容
 	CString titles[10]; int title_len = 0;//列表各标题（列表属性）
@@ -63,7 +63,7 @@ protected://绘画功能
 	void Drawrefresh();//刷新
 protected://列表功能
 	void ChangePage(bool next);//改变页数
-	void MenuChange();//编辑选项
+	void MenuChange(int num);//编辑选项
 public:
-	void Search(CString str);
+	void Search(CString str, int index = 0);
 };

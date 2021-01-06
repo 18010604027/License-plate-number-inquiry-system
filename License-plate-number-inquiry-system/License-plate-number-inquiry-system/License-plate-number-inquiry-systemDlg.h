@@ -46,6 +46,7 @@ protected:
 	afx_msg void OnBnClickedSearch();
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 	afx_msg void OnDestroy();
+	afx_msg void OnCbnSelchangeCombo1();
 	DECLARE_MESSAGE_MAP()
 	void OnSearchEditDown();
 protected:
@@ -57,14 +58,15 @@ protected:
 	CMyButton max_button;
 	CEdit search_edit;
 	CComboBox combo;
+	CComboBox combo_province;
 protected:
 	CRect m_rect;//窗口大小
 	Image* imgBackground;//背景
 	CFont* mFont;//字体(标题用)
+	bool value_province = false;//显示省份列表
 protected:
 	void AdjustSize(LPRECT pRect);//调整窗口控件位置
 	void RefreshAll();//全体刷新
 	void SetControl();//设置控件
 	void InitializedData();//初始化数据	
-
 };
