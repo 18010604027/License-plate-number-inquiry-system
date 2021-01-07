@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "MyList.h"
-
+#define M false//是否为动态链表
 IMPLEMENT_DYNAMIC(CMyList, CWnd)//声明控件
 CMyList::CMyList()
 {
@@ -27,10 +27,19 @@ CMyList::CMyList()
 
 	box_height = 25;//选框高度
 
-
-	if (list_data.plate_read("Data\\plate_num.data"))
+	if (M)
 	{
-		space_len = list_data.count();
+		if (list_data.plate_read("Data\\plate_num.data"))
+		{
+			space_len = list_data.count();
+		}
+	}
+	else
+	{
+		if (list_data2.plate_read("Data\\plate_num.data"))
+		{
+			space_len = list_data2.count();
+		}
 	}
 	total_page = space_len / page_options + (space_len % page_options ? 1 : 0);
 	if (total_page == 0)
@@ -39,10 +48,16 @@ CMyList::CMyList()
 	}
 	list_num = NULL;
 }
-
 CMyList:: ~CMyList()
 {
-	list_data.plate_write();
+	if (M)
+	{
+		list_data.plate_write();
+	}
+	else
+	{
+		list_data2.plate_write();
+	}
 
 }
 
@@ -75,12 +90,10 @@ void CMyList::AddItem(int i, ...)//增加列表选项
 	space_len++;
 	va_end(arg_ptr);*/
 }
-
 void CMyList::AddProverty(CString Title)
 {
 	titles[title_len++] = Title;
 }
-
 BOOL CMyList::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	if (zDelta > 0)
@@ -93,7 +106,6 @@ BOOL CMyList::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	}
 	return true;
 }
-
 void CMyList::OnMouseMove(UINT nFlags, CPoint point)
 {
 	if (!mouse_focus)
@@ -109,7 +121,6 @@ void CMyList::OnMouseMove(UINT nFlags, CPoint point)
 	Draw();
 	Drawrefresh();
 }
-
 LRESULT CMyList::OnMouseLeave(WPARAM wParam, LPARAM lParam)
 {
 	mouse_focus = false;
@@ -118,13 +129,11 @@ LRESULT CMyList::OnMouseLeave(WPARAM wParam, LPARAM lParam)
 	Drawrefresh();
 	return 0;
 }
-
 LRESULT CMyList::OnMouseHover(WPARAM wParam, LPARAM lParam)
 {
 
 	return 0;
 }
-
 void CMyList::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
 	if (option_num != -1 && option_num < page_options && option_num + page_options * (now_page - 1) < space_len)
@@ -133,7 +142,6 @@ void CMyList::OnLButtonDblClk(UINT nFlags, CPoint point)
 		MenuChange(page_options * (now_page - 1) + menu_num);
 	}
 }
-
 void CMyList::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	SetFocus();//获取焦点
@@ -141,7 +149,6 @@ void CMyList::OnLButtonDown(UINT nFlags, CPoint point)
 	Draw();
 	Drawrefresh();
 }
-
 void CMyList::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	l_click = false;
@@ -149,7 +156,6 @@ void CMyList::OnLButtonUp(UINT nFlags, CPoint point)
 	Drawrefresh();
 
 }
-
 void CMyList::OnRButtonDown(UINT nFlags, CPoint point)
 {
 	SetFocus();//获取焦点
@@ -183,7 +189,6 @@ void CMyList::OnRButtonDown(UINT nFlags, CPoint point)
 		menu.DestroyMenu(); //资源回收
 	}
 }
-
 void CMyList::OnSize(UINT nType, int cx, int cy)
 {
 	//调整大小参数
@@ -193,7 +198,6 @@ void CMyList::OnSize(UINT nType, int cx, int cy)
 	}
 
 }
-
 BOOL CMyList::OnEraseBkgnd(CDC* pDC)
 {
 	if (draw_dc)
@@ -209,25 +213,46 @@ BOOL CMyList::OnEraseBkgnd(CDC* pDC)
 	Drawrefresh();
 	return true;
 }
-
 void CMyList::OnDropFiles(HDROP hDropInfo)
 {
 	WCHAR szFilePath[1024];
 	UINT count;
 	count = DragQueryFile(hDropInfo, 0xFFFFFFFF, NULL, 0); //获取拖拽文件数
-
+	
 	for (int i = count - 1; i >= 0; i--)
 	{
+		
 		DragQueryFile(hDropInfo, i, szFilePath, sizeof(szFilePath)); //获取文件路径
 		DWORD dwNum;
 		CHAR psText[1024];
 		dwNum = sizeof(szFilePath);
 		WideCharToMultiByte(CP_OEMCP, NULL, szFilePath, -1, psText, dwNum, NULL, FALSE);
-		list_data.plate_read(psText);
+		if (M)
+		{
+			if (list_data.plate_read(psText))
+			{
+				change_file = true;
+			}
+		}
+		else
+		{
+			if (list_data2.plate_read(psText))
+			{
+				change_file = true;
+			}
+		}
 	}
 	//list_data._radix_sort();
-	list_data._quick_sort();
-	space_len = list_data.count();
+	if (M)
+	{
+		list_data._quick_sort();
+		space_len = list_data.count();
+	}
+	else
+	{
+		list_data2._radix_sort();
+		space_len = list_data2.count();
+	}
 	total_page = space_len / page_options + (space_len % page_options ? 1 : 0);
 	if (total_page == 0)
 	{
@@ -236,6 +261,57 @@ void CMyList::OnDropFiles(HDROP hDropInfo)
 	DrawTexts();
 	Draw();
 	Drawrefresh();
+}
+BOOL CMyList::OnCommand(WPARAM wParam, LPARAM lParam)
+{
+	// TODO: 在此添加专用代码和/或调用基类
+	UINT uMsg = LOWORD(wParam);
+	//接收菜单信息
+	if (uMsg == WM_MENU_ADD)
+	{
+		EditDlg dlg;
+		dlg.SetCaption(L"添加");
+		if (dlg.DoModal() == IDOK)
+		{
+			change_file = true;
+			CString license;
+			CString name;
+			CString place;
+			CString phone;
+			dlg.GetData(license,
+				name,
+				place,
+				phone);
+			if (M)
+			{
+				list_data.insert(license, name, place, phone);
+			}
+			else
+			{
+				list_data2.insert(license, name, place, phone);
+			}
+			DrawTexts();
+			Draw();
+			Drawrefresh();
+		}
+	}
+	if (uMsg == WM_MENU_EDIT)
+	{
+		MenuChange(page_options * (now_page - 1) + menu_num);
+	}
+	if (uMsg == WM_MENU_DELETE)
+	{
+		if (M)
+		{
+			list_data._delete(page_options * (now_page - 1) + menu_num + 1);
+		}
+		else
+		{
+			list_data2._delete(page_options * (now_page - 1) + menu_num + 1);
+		}
+	}
+
+	return CWnd::OnCommand(wParam, lParam);
 }
 
 void CMyList::Initialize()//初始化
@@ -279,7 +355,6 @@ void CMyList::Initialize()//初始化
 	DrawBackground();
 	DrawSelectBox();
 }
-
 void CMyList::Reinitialize()//重置大小参数
 {
 	/*重置位置参数*/
@@ -318,7 +393,6 @@ void CMyList::Reinitialize()//重置大小参数
 	DrawBackground();
 	DrawSelectBox();
 }
-
 void CMyList::DrawBackground()
 {
 	//白色填充
@@ -331,7 +405,6 @@ void CMyList::DrawBackground()
 	MapWindowPoints(p, &point, 1);
 	g.DrawImage(_background, -point.x, -point.y);
 }
-
 void CMyList::DrawTexts()//画文字
 {
 	//创建平台
@@ -379,7 +452,14 @@ void CMyList::DrawTexts()//画文字
 		for (int i = 0; p && i < page_options; i++, p = p->next)
 		{
 			plate_data* data;
-			data = list_data.return_num(p->num + 1)->data;
+			if (M)
+			{
+				data = list_data.return_num(p->num + 1)->data;
+			}
+			else
+			{
+				data = list_data2.return_num(p->num + 1)->data;
+			}
 			g.DrawString(data->license, data->license.GetLength(), &myFont2, RectF(2 + 0 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
 			g.DrawString(data->name, data->name.GetLength(), &myFont2, RectF(2 + 1 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
 			g.DrawString(data->place, data->place.GetLength(), &myFont2, RectF(2 + 2 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
@@ -392,7 +472,15 @@ void CMyList::DrawTexts()//画文字
 		for (int i = 0; i + page_options * (now_page - 1) < space_len && i < page_options; i++)
 		{
 			plate_data* data;
-			data = list_data.return_num(i + page_options * (now_page - 1) + 1)->data;
+			if (M)
+			{
+				data = list_data.return_num(i + page_options * (now_page - 1) + 1)->data;
+
+			}
+			else
+			{
+				data = list_data2.return_num(i + page_options * (now_page - 1) + 1)->data;
+			}
 			g.DrawString(data->license, data->license.GetLength(), &myFont2, RectF(2 + 0 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
 			g.DrawString(data->name, data->name.GetLength(), &myFont2, RectF(2 + 1 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
 			g.DrawString(data->place, data->place.GetLength(), &myFont2, RectF(2 + 2 * len, box_height * (i + 1) + 0, len, box_height), &font_attribute, &blackBrush);
@@ -403,7 +491,6 @@ void CMyList::DrawTexts()//画文字
 
 
 }
-
 void CMyList::DrawSelectBox()
 {
 	/*一般选框层*/
@@ -422,7 +509,6 @@ void CMyList::DrawSelectBox()
 	Gdiplus::SolidBrush brush2(Color(80, 127, 255, 170));
 	g2.FillRectangle(&brush2, RectF(0, 0, (Gdiplus::REAL)rect.Width, box_height));
 }
-
 void CMyList::Draw()
 {
 	draw_dc = false;
@@ -455,13 +541,11 @@ void CMyList::Draw()
 	DrawTexts();
 	g.DrawImage(layer_text, 0, 0);
 }
-
 void CMyList::Drawrefresh()
 {
 	CDC* pdc = GetDC();
 	pdc->BitBlt(crect.left, crect.top, crect.Width(), crect.Height(), &dc, 0, 0, SRCCOPY);
 }
-
 void CMyList::ChangePage(bool next)
 {
 	if (next)
@@ -494,6 +578,7 @@ void CMyList::MenuChange(int num)
 	dlg.SetCaption(L"编辑");
 	plate_data* data;
 	plate_node* node;
+	int num2;
 	if (list_num)
 	{
 		struct ListNum* p;
@@ -502,13 +587,33 @@ void CMyList::MenuChange(int num)
 		{
 			p = p->next;
 		}
-		node = list_data.return_num(p->num + 1);
+		if (M)
+		{
+			node = list_data.return_num(p->num + 1);
+		}
+		else
+		{
+			data = list_data2.return_num(p->num + 1)->data;
+		}
+		num2 = p->num + 1;
 	}
 	else
 	{
-		node = list_data.return_num(num + 1);
+		if (M)
+		{
+			node = list_data.return_num(num + 1);
+		}
+		else
+		{
+			data = list_data2.return_num(num + 1)->data;
+		}
+		num2 = num + 1;
 	}
-	data = node->data;
+	if (M)
+	{
+		data = node->data;
+	}
+	
 	dlg.SetData(4,
 		data->license,
 		data->name,
@@ -516,7 +621,15 @@ void CMyList::MenuChange(int num)
 		data->phone);
 	if (dlg.DoModal() == IDOK)
 	{
-		list_data._delete(node);
+		change_file = true;
+		if (M)
+		{
+			list_data._delete(node);
+		}
+		else
+		{
+			list_data2._delete(num2);
+		}
 		CString license;
 		CString name;
 		CString place;
@@ -525,49 +638,20 @@ void CMyList::MenuChange(int num)
 			name,
 			place,
 			phone);
-		list_data.insert(license, name, place, phone);
+		if (M)
+		{
+			list_data.insert(license, name, place, phone);
+
+		}
+		else
+		{
+			list_data2.insert(license, name, place, phone);
+		}
 		DrawTexts();
 		Draw();
 		Drawrefresh();
 	}
 }
-BOOL CMyList::OnCommand(WPARAM wParam, LPARAM lParam)
-{
-	// TODO: 在此添加专用代码和/或调用基类
-	UINT uMsg = LOWORD(wParam);
-	//接收菜单信息
-	if (uMsg == WM_MENU_ADD)
-	{
-		EditDlg dlg;
-		dlg.SetCaption(L"添加");
-		if (dlg.DoModal() == IDOK)
-		{
-			CString license;
-			CString name;
-			CString place;
-			CString phone;
-			dlg.GetData(license,
-				name,
-				place,
-				phone);
-			list_data.insert(license, name, place, phone);
-			DrawTexts();
-			Draw();
-			Drawrefresh();
-		}
-	}
-	if (uMsg == WM_MENU_EDIT)
-	{
-		MenuChange(page_options * (now_page - 1) + menu_num);
-	}
-	if (uMsg == WM_MENU_DELETE)
-	{
-		list_data._delete(page_options * (now_page - 1) + menu_num + 1);
-	}
-
-	return CWnd::OnCommand(wParam, lParam);
-}
-
 void CMyList::Search(CString str, int index)
 {
 	if (index == 0)
@@ -576,7 +660,14 @@ void CMyList::Search(CString str, int index)
 		{
 			delete list_num;
 		}
-		list_num = list_data.Search(kmp, str, space_len);
+		if (M)
+		{
+			list_num = list_data.Search(str, space_len);
+		}
+		else
+		{
+			list_num = list_data2.Search(str, space_len);
+		}
 		total_page = space_len / page_options + (space_len % page_options ? 1 : 0);
 		if (total_page == 0)
 		{
@@ -593,13 +684,27 @@ void CMyList::Search(CString str, int index)
 			delete list_num;
 			list_num = NULL;
 		}
-		if (index == 1)
-		{		
-			MenuChange(list_data.half_search(str));
-		}
-		else if (index == 2)
+		if (M)
 		{
-			MenuChange(list_data._index_search(str));
+			if (index == 1)
+			{
+				MenuChange(list_data.half_search(str));
+			}
+			else if (index == 2)
+			{
+				MenuChange(list_data._index_search(str));
+			}
+		}
+		else
+		{
+			if (index == 1)
+			{
+				MenuChange(list_data2.half_search(str));
+			}
+			else if (index == 2)
+			{
+				MenuChange(list_data2._index_search(str));
+			}
 		}
 	}
 	

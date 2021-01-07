@@ -1,5 +1,6 @@
 #pragma once
 #include"plate_number.h"
+#include"plate_nunber_temp.h"
 using namespace Gdiplus;
 
 #define WM_MENU_ADD 11990
@@ -30,6 +31,7 @@ public://消息区
 protected://列表内容
 	CString titles[10]; int title_len = 0;//列表各标题（列表属性）
 	plate_number list_data; int space_len;//列表数据
+	plate_number_temp list_data2;
 	struct ListNum* list_num;
 protected://列表状态
 	int option_num;//该页被选项
@@ -40,6 +42,7 @@ protected://列表状态
 	bool initialization;//是否已初始化
 	bool draw_dc;//是否绘画缓存
 	bool refresh = false;//是否进行位置刷新
+	bool change_file = false;//文件是否更改
 protected://列表属性
 	int total_page;//总页数
 	int page_options;//一页选项数

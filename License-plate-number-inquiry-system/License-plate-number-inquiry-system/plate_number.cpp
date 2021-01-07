@@ -14,8 +14,6 @@ int plate_node::operator >(const plate_node& c2) const
 	return 0;
 }
 
-
-
 plate_number::plate_number()
 {
 
@@ -25,11 +23,130 @@ plate_number::plate_number()
 	head->pre = NULL;
 	head->next = NULL;
 }
-
-void plate_number::clear_plate_num()
+plate_number::~plate_number()
 {
-	fstream fout; fout.open("plate_num.txt", ios_base::out);
-	fout.close();
+
+	plate_node* head_temp = head;
+	while (head_temp->next != NULL)
+	{
+		head_temp = head_temp->next;
+	}
+	while (head_temp->pre != NULL)
+	{
+		if (!head_temp->data)
+		{
+			delete head_temp->data;
+		}
+		head_temp = head_temp->pre;
+		delete head_temp->next;
+	}
+	delete head_temp->data;
+	delete head_temp;
+
+}
+
+void plate_number::printfList()
+{
+	plate_node* temp = NULL;
+	temp = head;
+	temp = temp->next;
+
+	string license;
+	string name;
+	string place;
+	string phone;
+
+	while (temp != NULL)
+	{
+		license = CT2A(temp->data->license.GetString());
+		name = CT2A(temp->data->name.GetString());
+		place = CT2A(temp->data->place.GetString());
+		phone = CT2A(temp->data->phone.GetString());
+
+		cout << license << endl;
+		cout << name << " " << place << " " << phone << endl;
+		temp = temp->next;
+	}
+}
+plate_node* plate_number::return_num(int x)
+{
+	int temp = 0;
+	plate_node* head_temp = NULL;
+	head_temp = head;
+	while (temp < x && head_temp->next != NULL)
+	{
+		head_temp = head_temp->next;
+		temp++;
+	}
+	return head_temp;
+}
+
+void plate_number::insert(CString license, CString name, CString place, CString phone)
+{
+	//插入在头结点之后
+	plate_node* p1 = new plate_node;
+	p1->data = new plate_data;
+	p1->next = NULL;
+	p1->pre = NULL;
+	p1->data->license = license;//////////////////////////////////////////////1333333333333333333333333333
+
+	p1->data->name = name; p1->data->place = place; p1->data->phone = phone;
+	plate_node* head_temp = head;
+	if (head_temp->next == NULL)//链表是不是只有头结点//是==，不是=，别犯这种低级错误
+	{
+		head_temp->next = p1;
+		p1->pre = head_temp;
+	}
+	else
+	{
+		while (head_temp->next != NULL)
+		{
+			head_temp = head_temp->next;
+			if (p1->data->license < head_temp->data->license)//注意这里是小于号<，不是大于号
+			{
+				p1->next = head_temp;
+				p1->pre = head_temp->pre;
+				head_temp->pre->next = p1;
+				head_temp->pre = p1;
+				break;
+			}
+		}
+		if (head_temp->next == NULL)
+		{
+			if (head_temp->pre->data->license == p1->data->license)
+			{
+				return;
+			}
+			else
+			{
+				head_temp->next = p1;
+				p1->pre = head_temp;
+			}
+		}
+	}
+}
+void plate_number::_delete(plate_node* p1)
+{
+	p1->pre->next = p1->next;
+	p1->next->pre = p1->pre;
+	delete p1;
+}
+void plate_number::_delete(int x)
+{
+	int i = 0;
+	plate_node* head_temp = head;
+	while (i < x)
+	{
+		i++;    //别忘了这句话，别犯这种低级错误
+		head_temp = head_temp->next;
+	}
+	head_temp->pre->next = head_temp->next;
+	head_temp->next->pre = head_temp->pre;
+	delete head_temp;
+	/*
+	p1->pre->next = p1->next;
+	p1->next->pre = p1->pre;
+	*/
 }
 
 bool plate_number::plate_read(char filename[])
@@ -79,173 +196,6 @@ bool plate_number::plate_read(char filename[])
 	fin.close();
 	return true;
 }
-void plate_number::printfList()
-{
-	plate_node* temp = NULL;
-	temp = head;
-	temp = temp->next;
-
-	string license;
-	string name;
-	string place;
-	string phone;
-
-	while (temp != NULL)
-	{
-		license = CT2A(temp->data->license.GetString());
-		name = CT2A(temp->data->name.GetString());
-		place = CT2A(temp->data->place.GetString());
-		phone = CT2A(temp->data->phone.GetString());
-
-		cout << license << endl;
-		cout << name << " " << place << " " << phone << endl;
-		temp = temp->next;
-	}
-}
-
-plate_node* plate_number::return_num(int x)
-{
-	int temp = 0;
-	plate_node* head_temp = NULL;
-	head_temp = head;
-	while (temp < x && head_temp->next != NULL)
-	{
-		head_temp = head_temp->next;
-		temp++;
-	}
-	return head_temp;
-}
-
-void plate_number::_delete(plate_node* p1)
-{
-	p1->pre->next = p1->next;
-	p1->next->pre = p1->pre;
-	delete p1;
-}
-
-void plate_number::_delete(int x)
-{
-	int i = 0;
-	plate_node* head_temp = head;
-	while (i < x)
-	{
-		i++;    //别忘了这句话，别犯这种低级错误
-		head_temp = head_temp->next;
-	}
-	head_temp->pre->next = head_temp->next;
-	head_temp->next->pre = head_temp->pre;
-	delete head_temp;
-	/*
-	p1->pre->next = p1->next;
-	p1->next->pre = p1->pre;
-	*/
-}
-
-void plate_number::insert(CString license, CString name, CString place, CString phone)
-{
-	//插入在头结点之后
-	plate_node* p1 = new plate_node;
-	p1->data = new plate_data;
-	p1->next = NULL;
-	p1->pre = NULL;
-	p1->data->license = license;//////////////////////////////////////////////1333333333333333333333333333
-
-	/*
-	CString name_1;
-	CString place_1;
-	CString phone_1;
-	name_1 = name.c_str();
-	place_1 = place.c_str();
-	phone_1 = phone.c_str();
-	*/
-
-	p1->data->name = name; p1->data->place = place; p1->data->phone = phone;
-	plate_node* head_temp = head;
-	if (head_temp->next == NULL)//链表是不是只有头结点//是==，不是=，别犯这种低级错误
-	{
-		head_temp->next = p1;
-		p1->pre = head_temp;
-	}
-	else
-	{
-		while (head_temp->next != NULL)
-		{
-			head_temp = head_temp->next;
-			if (p1->data->license < head_temp->data->license)//注意这里是小于号<，不是大于号
-			{
-				p1->next = head_temp;
-				p1->pre = head_temp->pre;
-				head_temp->pre->next = p1;
-				head_temp->pre = p1;
-				break;
-			}
-		}
-		if (head_temp->next == NULL)
-		{
-			if (head_temp->pre->data->license == p1->data->license)
-			{
-				return;
-			}
-			else
-			{
-				head_temp->next = p1;
-				p1->pre = head_temp;
-			}
-		}
-		/*
-		p1->next = head_temp->next;
-		head_temp->next->pre = p1;
-		head_temp->next = p1;
-		p1->pre = head_temp;
-		*/
-	}
-	//delete p1->data;这里不能删了这两个空间
-	//delete p1;这里不能删了这两个空间
-}
-void plate_number::_quick_sort()
-{
-	plate_node* head_temp = NULL;
-	head_temp = head;
-	while (head_temp->next != NULL)
-	{
-		head_temp = head_temp->next;
-	}
-	quick_sort<plate_node, plate_data>(head->next, head_temp);
-}
-int NumChange(int index, int num)
-{
-	if (index == 0)
-	{
-		const wchar_t province_short[] = { L'云', L'京',L'冀',L'吉',L'宁',L'川',L'新',L'晋',L'桂',L'沪',L'津',L'浙',L'渝',L'港',L'湘',L'澳',
-			L'琼',L'甘',L'皖',L'粤',L'苏',L'蒙',
-			L'藏',L'豫',L'贵',L'赣',L'辽',L'鄂',
-			L'闽',L'陕',L'青',L'鲁',L'黑'
-		};
-		for (int i = 0; i < 33; i++)
-		{
-			if (num == province_short[i])
-			{
-				return i;
-			}
-		}
-		return 0;
-	}
-	else if (index == 1)
-	{
-		return num - 'A';
-	}
-	else
-	{
-		return num - L'0';
-	}
-}
-void plate_number::_radix_sort()
-{
-	const int Num[] = { 256,26,10,10,10,10,10 };
-	//PutDebug(2, head->next->data->license[1], head->next->data->license[2]);
-	plate_node* p = head->next;
-	radix(head, count(), Num, NumChange, 7);
-}
 void plate_number::plate_write()
 {
 	string license;
@@ -269,27 +219,29 @@ void plate_number::plate_write()
 	}
 	fout.close();
 }
-plate_number::~plate_number()
+void plate_number::clear_plate_num()
 {
+	fstream fout; fout.open("plate_num.txt", ios_base::out);
+	fout.close();
+}
 
-	plate_node* head_temp = head;
+void plate_number::_quick_sort()
+{
+	plate_node* head_temp = NULL;
+	head_temp = head;
 	while (head_temp->next != NULL)
 	{
 		head_temp = head_temp->next;
 	}
-	while (head_temp->pre != NULL)
-	{
-		if (!head_temp->data)
-		{
-			delete head_temp->data;
-		}
-		head_temp = head_temp->pre;
-		delete head_temp->next;
-	}
-	delete head_temp->data;
-	delete head_temp;
-
+	quick_sort<plate_node, plate_data>(head->next, head_temp);
 }
+void plate_number::_radix_sort()
+{
+	const int Num[] = { 31,26,10,10,10,10,10 };
+	plate_node* p = head->next;
+	radix(head, count(), Num, NumChange, 7);
+}
+
 int plate_number::count()
 {
 	int i = 0;
@@ -303,93 +255,6 @@ int plate_number::count()
 
 }
 
-//template <class T>
-//T plate_number::Search(T(*visit)(va_list arg_ptr), ...)
-//{
-//	va_list arg_ptr;
-//	va_start(arg_ptr, visit);
-//	return visit(arg_ptr);
-//}
-struct ListNum* plate_number::Search(bool(*visit)(CString, CString), CString sub, int& num)
-{
-	int i = 0;
-	num = 0;
-	plate_node* head_temp = head->next;
-	struct ListNum* list_num = new struct ListNum;
-	struct ListNum* p = list_num;
-	while (head_temp != NULL)
-	{
-		plate_data* data = head_temp->data;
-		if (visit(data->license, sub))
-		{
-			p->next = new struct ListNum;
-			p = p->next;
-			p->num = i;
-			num++;
-		}
-		head_temp = head_temp->next;
-		i++;
-	}
-	p->next = NULL;
-	return list_num;
-}
-
-
-int plate_number::half_search(CString license)
-{
-	int i = 0, j = 0, k = 0;
-	plate_node* head_temp = head->next;
-	while (head_temp != NULL)
-	{
-		head_temp = head_temp->next;
-		i++;
-	}
-	head_temp = head->next;
-	k = i;
-	CString arr[100];
-	while (head_temp != NULL && j < 100)
-	{
-		arr[j] = head_temp->data->license;
-		head_temp = head_temp->next;
-		j++;
-	}
-	int low = 0, high = j - 1, mid;
-	if (arr[low] == license)
-	{
-		return low;
-	}
-	else if (arr[high] == license)
-	{
-		return high;
-	}
-	else
-	{
-		while (low <= high)
-		{
-			mid = (low + high) / 2;
-			if (arr[mid] == license)
-			{
-				return mid;
-			}
-			if (license > arr[mid])
-			{
-				low = mid + 1;
-			}
-			else
-			{
-				high = mid - 1;
-			}
-		}
-	}
-	return -1;
-}
-
-typedef struct index_mark
-{
-	CString pro;
-	int begin;
-	int end;
-}index_mark;
 //注意，这个函数的前提是链表已经排好序了，否则建立的索引表是不正确的
 int plate_number::_index_search(CString license)
 {
@@ -791,3 +656,105 @@ int plate_number::_index_search(CString license)
 	}
 	return -1;
 }
+int plate_number::half_search(CString license)
+{
+	int i = 0, j = 0, k = 0;
+	plate_node* head_temp = head->next;
+	while (head_temp != NULL)
+	{
+		head_temp = head_temp->next;
+		i++;
+	}
+	head_temp = head->next;
+	k = i;
+	CString arr[100];
+	while (head_temp != NULL && j < 100)
+	{
+		arr[j] = head_temp->data->license;
+		head_temp = head_temp->next;
+		j++;
+	}
+	int low = 0, high = j - 1, mid;
+	if (arr[low] == license)
+	{
+		return low;
+	}
+	else if (arr[high] == license)
+	{
+		return high;
+	}
+	else
+	{
+		while (low <= high)
+		{
+			mid = (low + high) / 2;
+			if (arr[mid] == license)
+			{
+				return mid;
+			}
+			if (license > arr[mid])
+			{
+				low = mid + 1;
+			}
+			else
+			{
+				high = mid - 1;
+			}
+		}
+	}
+	return -1;
+}
+struct ListNum* plate_number::Search(CString sub, int& num)
+{
+	int i = 0;
+	num = 0;
+	plate_node* head_temp = head->next;
+	struct ListNum* list_num = new struct ListNum;
+	struct ListNum* p = list_num;
+	int* next = new int[sub.GetLength()];
+	get_next(sub, next, sub.GetLength());
+	while (head_temp != NULL)
+	{
+		plate_data* data = head_temp->data;
+		if (kmp(data->license, sub, next))
+		{
+			p->next = new struct ListNum;
+			p = p->next;
+			p->num = i;
+			num++;
+		}
+		head_temp = head_temp->next;
+		i++;
+	}
+	p->next = NULL;
+	return list_num;
+}
+
+int NumChange(int index, int num)
+{
+	if (index == 0)
+	{
+		const wchar_t province_short[] = { L'云', L'京',L'冀',L'吉',L'宁',L'川',L'新',L'晋',L'桂',L'沪',L'津',L'浙',L'渝',L'湘',
+			L'琼',L'甘',L'皖',L'粤',L'苏',L'蒙',
+			L'藏',L'豫',L'贵',L'赣',L'辽',L'鄂',
+			L'闽',L'陕',L'青',L'鲁',L'黑'
+		};
+		for (int i = 0; i < 31; i++)
+		{
+			if (num == province_short[i])
+			{
+				return i;
+			}
+		}
+		return 0;
+	}
+	else if (index == 1)
+	{
+		return num - 'A';
+	}
+	else
+	{
+		return num - L'0';
+	}
+}
+

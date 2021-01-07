@@ -17,6 +17,7 @@
 #include "License-plate-number-inquiry-systemDlg.h"
 
 #include "plate_number.h"
+#include"plate_nunber_temp.h"
 
 #include "kmp.h"
 #include "sort.h"

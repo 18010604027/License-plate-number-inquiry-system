@@ -8,6 +8,13 @@ struct ListNum
 	struct ListNum* next;
 };
 
+typedef struct index_mark
+{
+	CString pro;
+	int begin;
+	int end;
+}index_mark;
+
 struct plate_data
 {
 	CString license;
@@ -47,8 +54,10 @@ public:
 	int _index_search(CString license);  //Ë÷Òı²éÕÒ
 	//template <class T>
 	//T Search(T(*visit)(va_list arg_ptr), ...) ;
-	struct ListNum* Search(bool(*visit)(CString, CString), CString sub, int& num);
+	struct ListNum* Search(CString sub, int& num);
 	int count();
 	~plate_number();
 	plate_node* head;
 };
+
+int NumChange(int index, int num);

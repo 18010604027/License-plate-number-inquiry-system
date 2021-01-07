@@ -24,14 +24,22 @@ void get_next(CString sub, int next[], int len)
 	}
 }
 
-bool kmp(CString s, CString sub)//, int pos = 0)
+bool kmp(CString s, CString sub, int* _next)//, int pos = 0)
 {
 	int i = 0;
 	int j = 0;
 	int len = s.GetLength();
 	int len2 = sub.GetLength();
-	int* next = new int[len2];
-	get_next(sub, next, len2);
+	int* next;
+	if (_next)
+	{
+		next = _next;
+	}
+	else
+	{
+		next = new int[len2];
+		get_next(sub, next, len2);
+	}
 	for (; i < len && j < len2;)
 	{
 		if (s[i] == sub[j])
@@ -48,7 +56,10 @@ bool kmp(CString s, CString sub)//, int pos = 0)
 			j = next[j];
 		}
 	}
-	delete[] next;
+	if (!_next)
+	{
+		delete[] next;
+	}
 	if (j == len2)
 	{
 		return true;
