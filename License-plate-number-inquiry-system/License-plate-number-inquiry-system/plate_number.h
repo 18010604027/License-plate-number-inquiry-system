@@ -38,26 +38,30 @@ typedef struct plate_node
 
 class plate_number
 {
+private:
+	plate_node* head;
 public:
 	plate_number();
-	void clear_plate_num();
-	bool plate_read(char filename[]);
-	void printfList();
-	plate_node* return_num(int x);
+	~plate_number();
+
 	void insert(CString license, CString name, CString place, CString phone);
 	void _delete(plate_node* p1);
 	void _delete(int x);
+
+	bool plate_read(char filename[]);
+	void clear_plate_num();
+	void plate_write();
+	void printfList();
+
 	void _quick_sort();
 	void _radix_sort();
-	void plate_write();
+	
 	int half_search(CString license);   //折半查找//这个函数会溢出栈
 	int _index_search(CString license);  //索引查找
-	//template <class T>
-	//T Search(T(*visit)(va_list arg_ptr), ...) ;
 	struct ListNum* Search(CString sub, int& num);
-	int count();
-	~plate_number();
-	plate_node* head;
+
+	plate_node* return_num(int x);
+	int count();	
 };
 
 int NumChange(int index, int num);

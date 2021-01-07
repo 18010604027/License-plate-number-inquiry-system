@@ -128,7 +128,6 @@ void CMyMenu::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 	lpMeasureItemStruct->itemWidth = 80;
 }
 
-
 void CMyMenu::RemoveMenuBorder(HINSTANCE hInst, BOOL bRemove /* = TRUE */)
 {
 	m_bRemoveBorder = bRemove; // ฑ๊สถ
